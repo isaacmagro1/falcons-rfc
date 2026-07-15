@@ -307,9 +307,67 @@
       q.addEventListener("change", function () { self.update(); });
     });
 
+    this.initDrag();
     this.update();
     this.play();
   }
+
+  /**
+   * Pointer-based drag/swipe. The track follows the finger 1:1; on release
+   * a quick flick (velocity > 0.11 px/ms) or a 50px pull changes slide,
+   * anything less snaps back. A 6px threshold separates taps from drags,
+   * and extra pointers mid-drag are ignored.
+   */
+  Carousel.prototype.initDrag = function () {
+    var self = this;
+    var startX = 0, startTime = 0, dx = 0, pointerId = null;
+
+    function basePx() {
+      return -self.index * (self.viewport.clientWidth / self.perView());
+    }
+
+    this.viewport.addEventListener("pointerdown", function (e) {
+      if (pointerId !== null || !e.isPrimary) { return; }
+      pointerId = e.pointerId;
+      startX = e.clientX;
+      startTime = Date.now();
+      dx = 0;
+      self.pause();
+      self.viewport.setPointerCapture(pointerId);
+    });
+
+    this.viewport.addEventListener("pointermove", function (e) {
+      if (e.pointerId !== pointerId) { return; }
+      dx = e.clientX - startX;
+      if (Math.abs(dx) > 6) {
+        self.viewport.classList.add("is-dragging");
+        self.track.classList.add("no-transition");
+        self.track.style.transform = "translateX(" + (basePx() + dx) + "px)";
+      }
+    });
+
+    function release(e) {
+      if (e.pointerId !== pointerId) { return; }
+      pointerId = null;
+      self.viewport.classList.remove("is-dragging");
+      self.track.classList.remove("no-transition");
+
+      var velocity = Math.abs(dx) / Math.max(Date.now() - startTime, 1);
+      if (dx <= -50 || (dx < -6 && velocity > 0.11)) {
+        self.step(1, true);
+      } else if (dx >= 50 || (dx > 6 && velocity > 0.11)) {
+        self.step(-1, true);
+      } else {
+        self.update();   // snap back
+        self.play();
+      }
+      dx = 0;
+    }
+    this.viewport.addEventListener("pointerup", release);
+    this.viewport.addEventListener("pointercancel", release);
+    // Native image drag would hijack the pointer gesture (future sponsor logos)
+    this.viewport.addEventListener("dragstart", function (e) { e.preventDefault(); });
+  };
 
   Carousel.prototype.perView = function () {
     if (window.matchMedia("(min-width: 1024px)").matches) { return 4; }
@@ -471,6 +529,32 @@
     if (el) { el.textContent = String(new Date().getFullYear()); }
   }
 
+  /** Highlight the nav link for the section currently in view. */
+  function initScrollSpy() {
+    var links = document.querySelectorAll('.nav-links a[href^="#"]');
+    if (!links.length || !("IntersectionObserver" in window)) { return; }
+    var byId = {};
+    links.forEach(function (l) { byId[l.getAttribute("href").slice(1)] = l; });
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) { return; }
+        links.forEach(function (l) { l.removeAttribute("aria-current"); });
+        var link = byId[entry.target.id];
+        if (link) { link.setAttribute("aria-current", "true"); }
+      });
+      // Above the first section (hero): no section is current
+      if (window.scrollY < window.innerHeight * 0.4) {
+        links.forEach(function (l) { l.removeAttribute("aria-current"); });
+      }
+    }, { rootMargin: "-35% 0px -55% 0px" });
+
+    Object.keys(byId).forEach(function (id) {
+      var section = document.getElementById(id);
+      if (section) { observer.observe(section); }
+    });
+  }
+
   /* ------------------------------------------------------------------------
      BOOT
      ------------------------------------------------------------------------ */
@@ -478,6 +562,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     initHeader();
     initFooterYear();
+    initScrollSpy();
 
     loadData()
       .then(function (data) {

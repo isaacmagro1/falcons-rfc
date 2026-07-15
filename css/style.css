@@ -127,6 +127,12 @@ a {
   text-decoration: none;
 }
 
+/* Kill the legacy 300ms tap delay on touch browsers */
+a,
+button {
+  touch-action: manipulation;
+}
+
 :focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 3px;
@@ -353,7 +359,8 @@ a {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text);
-  padding: 0.5rem 0.25rem;
+  /* ≥44px tap target inside the 64px bar */
+  padding: 0.875rem 0.375rem;
   border-bottom: 2px solid transparent;
   transition: color 150ms ease, border-color 150ms ease;
 }
@@ -362,6 +369,11 @@ a {
     color: var(--gold);
     border-bottom-color: var(--gold);
   }
+}
+/* Scrollspy: JS marks the section in view */
+.nav-links a[aria-current="true"] {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
 }
 
 @media (min-width: 768px) {
@@ -544,6 +556,8 @@ a {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--s-3);
+  /* Reserve space so cards arriving after fetch don't shift the page (CLS) */
+  min-height: 280px;
 }
 @media (min-width: 768px) {
   .matches-grid { grid-template-columns: repeat(2, 1fr); }
@@ -823,6 +837,17 @@ a {
   /* Soft edges hint that the row continues beyond the frame */
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+  /* Horizontal drag is ours; vertical stays with the page scroll */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+.carousel__viewport.is-dragging {
+  cursor: grabbing;
+}
+.carousel__track.no-transition {
+  transition: none;
 }
 .carousel__track {
   display: flex;
@@ -1166,6 +1191,9 @@ a.sponsor-card:active {
   color: var(--text-muted);
 }
 .footer-col a {
+  display: inline-block;
+  padding-block: 0.375rem;
+  margin-block: -0.375rem;
   color: var(--text-muted);
   transition: color 150ms ease;
 }
