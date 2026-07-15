@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Falcons RFC — Rugby in Black &amp; Gold | San Pawl il-Baħar, Malta</title>
+  <meta name="description" content="Official home of Falcons RFC — Malta Rugby Championship and Prestige Cup fixtures, club partners and how to join the flock. San Pawl il-Baħar, Malta." />
+  <meta name="theme-color" content="#0A0A0B" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Falcons RFC — Rugby in Black &amp; Gold" />
+  <meta property="og:description" content="Season 2026/27 fixtures, club partners and the story of the flock. San Pawl il-Baħar, Malta." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/img/falcons-logo.png" />
+
+  <link rel="icon" type="image/png" href="assets/img/favicon.png" />
+
+  <!-- Fonts are self-hosted: preload the two critical faces to avoid FOUT on the hero -->
+  <link rel="preload" href="assets/fonts/anton-regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/fonts/glacial-regular.woff2" as="font" type="font/woff2" crossorigin />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <a class="skip-link" href="#matches">Skip to fixtures</a>
+
+  <!-- ============ HEADER / NAV ============ -->
+  <header class="site-header" id="top">
+    <nav class="site-nav container" aria-label="Primary">
+      <a class="nav-brand" href="#top">
+        <img src="assets/img/falcons-mark.png" alt="" width="44" height="25" />
+        <span class="nav-brand__word">Falcons</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#matches">Fixtures</a></li>
+        <li><a href="#sponsors">Partners</a></li>
+        <li><a href="#club">The Club</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" aria-label="Welcome">
+    <div class="hero__inner container">
+      <img class="hero__logo" src="assets/img/falcons-logo.png"
+           alt="Falcons RFC crest — a gold falcon in flight above the Falcons wordmark"
+           width="480" height="239" fetchpriority="high" />
+      <p class="hero__eyebrow">San Pawl il-Baħar &bull; Malta</p>
+      <h1 class="hero__title">Rugby in<br /><span>Black &amp; Gold</span></h1>
+      <p class="hero__tagline">Malta Rugby Championship &bull; Prestige Cup &bull; Season 2026/27</p>
+      <div class="hero__actions">
+        <a class="btn btn--gold" href="#matches">View Upcoming Matches</a>
+        <a class="btn btn--ghost" href="#club">Join the Flock</a>
+      </div>
+
+      <!-- Populated by JS with the next fixture; hidden until data loads -->
+      <a class="hero__next" id="hero-next" href="#matches" hidden>
+        <span class="hero__next-label">Next match</span>
+        <span class="hero__next-detail" id="hero-next-detail"></span>
+      </a>
+    </div>
+    <div class="hero__scroll" aria-hidden="true"></div>
+  </section>
+
+  <main>
+    <!-- ============ FIXTURES ============ -->
+    <section class="section section--matches" id="matches" aria-labelledby="matches-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="section-head__eyebrow">Season 2026/27</p>
+          <h2 class="section-head__title" id="matches-title">Upcoming Matches</h2>
+          <p class="section-head__sub" id="matches-sub">Malta Rugby Championship &amp; Prestige Cup. Past fixtures drop off automatically.</p>
+        </header>
+
+        <div class="matches-grid" id="matches-grid" aria-live="polite">
+          <!-- Match cards rendered by js/script.js -->
+        </div>
+        <p class="matches-note" id="matches-note" hidden></p>
+      </div>
+    </section>
+
+    <!-- ============ SPONSORS ============ -->
+    <section class="section section--sponsors" id="sponsors" aria-labelledby="sponsors-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="section-head__eyebrow">Our Partners</p>
+          <h2 class="section-head__title" id="sponsors-title">Powered by the Best</h2>
+          <p class="section-head__sub">The businesses that keep the flock flying. Thank you for your continuous support for the club and the players.</p>
+        </header>
+
+        <!-- Main sponsor spotlight (rendered by JS) -->
+        <div class="sponsor-spotlight" id="sponsor-spotlight"></div>
+
+        <!-- Auto-rotating carousel: 4 / 3 / 2 per view, pauses on hover & focus -->
+        <div class="carousel" id="sponsor-carousel">
+          <div class="carousel__viewport" id="carousel-viewport" tabindex="0"
+               role="region" aria-roledescription="carousel" aria-label="Club partners">
+            <ul class="carousel__track" id="carousel-track">
+              <!-- Sponsor cards rendered by js/script.js -->
+            </ul>
+          </div>
+          <div class="carousel__controls">
+            <button class="carousel__btn" id="carousel-prev" type="button" aria-label="Previous partners">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <p class="carousel__status" id="carousel-status" aria-live="polite"></p>
+            <button class="carousel__btn" id="carousel-next" type="button" aria-label="Next partners">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MATCHDAY BANNER ============ -->
+    <aside class="banner" aria-label="Matchday call-out">
+      <div class="banner__inner container">
+        <p class="banner__kicker">Matchday</p>
+        <p class="banner__line">From Marsa to New Hibs — bring the noise.</p>
+        <a class="btn btn--dark" href="#matches">See the fixture list</a>
+      </div>
+    </aside>
+
+    <!-- ============ THE CLUB ============ -->
+    <section class="section section--club" id="club" aria-labelledby="club-title">
+      <div class="container club-grid">
+        <div class="club-copy">
+          <header class="section-head section-head--left">
+            <p class="section-head__eyebrow">The Club</p>
+            <h2 class="section-head__title" id="club-title">More Than a Team</h2>
+          </header>
+          <div class="club-about" id="club-about">
+            <!-- Paragraphs rendered from data/team-info.json -->
+          </div>
+          <dl class="club-facts" id="club-facts">
+            <!-- Facts rendered from data/team-info.json -->
+          </dl>
+          <div class="club-social" id="club-social">
+            <!-- Social links rendered from data/team-info.json -->
+          </div>
+        </div>
+
+        <div class="club-side">
+          <figure class="club-photo">
+            <img src="assets/img/jersey-detail.jpg"
+                 alt="Close-up of the Falcons jersey — black and gold panels split by twin white stripes"
+                 loading="lazy" width="1400" height="787" />
+            <figcaption>The 2026/27 jersey — triangles woven into the fabric.</figcaption>
+          </figure>
+          <div class="honours" id="club-honours">
+            <!-- Honour cards rendered from data/team-info.json -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="assets/img/falcons-mark.png" alt="" width="56" height="31" loading="lazy" />
+        <p class="footer-brand__name">Falcons RFC</p>
+        <p class="footer-brand__line">Rugby in black &amp; gold.<br />San Pawl il-Baħar, Malta.</p>
+      </div>
+      <nav class="footer-col" aria-label="Footer">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="#matches">Fixtures</a></li>
+          <li><a href="#sponsors">Partners</a></li>
+          <li><a href="#club">The Club</a></li>
+        </ul>
+      </nav>
+      <div class="footer-col">
+        <h3>Competitions</h3>
+        <ul>
+          <li>Malta Rugby Championship</li>
+          <li>Prestige Cup</li>
+        </ul>
+      </div>
+      <div class="footer-col" id="footer-social">
+        <h3>Follow the Flock</h3>
+        <ul>
+          <!-- Social links rendered by JS -->
+        </ul>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <div class="container footer-legal__inner">
+        <p>&copy; <span id="footer-year">2026</span> Falcons RFC. All rights reserved.</p>
+        <p>Marsa Rugby Football Pitch &bull; New Hibs Ground</p>
+      </div>
+    </div>
+  </footer>
+
+  <noscript>
+    <div class="noscript-note">
+      <p>This site needs JavaScript to show live fixtures and partners. Season 2026/27 opens on 10 October 2026 — Falcons vs Wolves at Marsa.</p>
+    </div>
+  </noscript>
+
+  <!--
+    Inline copy of data/*.json so the site still renders when opened
+    directly from disk (file://), where fetch() is blocked by browsers.
+    When served over HTTP the JSON files are the source of truth.
+  -->
+  <script type="application/json" id="fallback-data">
+  {"matches":{"season":"2026/27","note":"Kick-off times are announced by the Malta Rugby Football Union closer to each matchday.","matches":[{"id":"mrc-md1","competition":"Malta Rugby Championship","round":"Matchday 1","date":"2026-10-10","time":null,"opponent":"Wolves","venue":"Marsa Rugby Football Pitch"},{"id":"mrc-md3","competition":"Malta Rugby Championship","round":"Matchday 3","date":"2026-10-24","time":null,"opponent":"Overseas","venue":"New Hibs Ground"},{"id":"mrc-md4","competition":"Malta Rugby Championship","round":"Matchday 4","date":"2026-11-21","time":null,"opponent":"Stompers","venue":"Marsa Rugby Football Pitch"},{"id":"mrc-md5","competition":"Malta Rugby Championship","round":"Matchday 5","date":"2026-11-28","time":null,"opponent":"Kavallieri","venue":"Marsa Rugby Football Pitch"},{"id":"mrc-md6","competition":"Malta Rugby Championship","round":"Matchday 6","date":"2026-12-05","time":null,"opponent":"Wolves","venue":"New Hibs Ground"},{"id":"mrc-md8","competition":"Malta Rugby Championship","round":"Matchday 8","date":"2027-01-09","time":null,"opponent":"Overseas","venue":null},{"id":"mrc-md9","competition":"Malta Rugby Championship","round":"Matchday 9","date":"2027-01-16","time":null,"opponent":"Stompers","venue":"New Hibs Ground"},{"id":"mrc-md10","competition":"Malta Rugby Championship","round":"Matchday 10","date":"2027-01-23","time":null,"opponent":"Kavallieri","venue":null},{"id":"mrc-md11","competition":"Malta Rugby Championship","round":"Matchday 11","date":"2027-01-30","time":null,"opponent":"Wolves","venue":"New Hibs Ground"},{"id":"mrc-md13","competition":"Malta Rugby Championship","round":"Matchday 13","date":"2027-03-06","time":null,"opponent":"Overseas","venue":"Marsa Rugby Football Pitch"},{"id":"mrc-md14","competition":"Malta Rugby Championship","round":"Matchday 14","date":"2027-03-13","time":null,"opponent":"Stompers","venue":"Marsa Rugby Football Pitch"},{"id":"mrc-md15","competition":"Malta Rugby Championship","round":"Matchday 15","date":"2027-03-20","time":null,"opponent":"Kavallieri","venue":"Marsa Rugby Football Pitch"},{"id":"cup-sf","competition":"Prestige Cup","round":"Semi-final","date":"2027-04-10","time":null,"opponent":"Kavallieri","venue":null},{"id":"cup-final","competition":"Prestige Cup","round":"Final","date":"2027-04-24","time":null,"opponent":null,"venue":null,"note":"Finalists decided by the semi-finals"}]},"sponsors":{"note":"Sponsor roster from the Falcons RFC branding guide, season 2026. Drop a logo file into assets/img/sponsors/ and set its path in \"logo\" to replace the monogram tile.","sponsors":[{"name":"Cisk Pilsner","tier":"main","tagline":"Main Sponsor — Season 2026/27","logo":null,"website":null},{"name":"Deefort","tier":"partner","tagline":"Official Kit Partner","logo":null,"website":null},{"name":"The San Paolo","tier":"partner","tagline":"San Pawl il-Baħar","logo":null,"website":null},{"name":"Dalton Reefer's Ltd","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Portughes","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Prestige","tier":"partner","tagline":"Prestige Cup Partner","logo":null,"website":null},{"name":"Lemon Soda","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Martina's","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Heels & Keys","tier":"partner","tagline":"Key Cutting & Shoe Repair","logo":null,"website":null}]},"teamInfo":{"name":"Falcons RFC","shortName":"Falcons","location":"San Pawl il-Baħar, Malta","colors":"Black & Gold","league":"Malta Rugby Championship","cup":"Prestige Cup","grounds":["Marsa Rugby Football Pitch","New Hibs Ground"],"about":["With more than two decades of rugby behind us, Falcons RFC is one of Malta's five senior clubs, competing at the top of the Maltese game in the Malta Rugby Championship and the Prestige Cup. We wear black and gold with intent — every triangle on the jersey is a nod to the flock behind us.","The Falcons have grown into a family club, fielding men's, women's and youth teams — our women's side was one of the first women's rugby teams in Malta. From Marsa to New Hibs, matchday brings players, supporters, sponsors and volunteers together. Whether you have played all your life or never touched a rugby ball, there is a place for you in the flock."],"honours":[{"title":"Mediterranean Bank Cup","detail":"2nd Division winners — 2013/14 & 2014/15"},{"title":"Women's 7s & 10s Champions","detail":"Both tournament titles — 2013/14 season"},{"title":"Player of the Year","detail":"Kyle Gauci — Malta Rugby Championship"},{"title":"Top Scorer of the Year","detail":"Brendan Dalton — Malta Rugby Championship"}],"social":[{"platform":"Instagram","handle":"@falconsmalta","url":"https://instagram.com/falconsmalta"},{"platform":"Facebook","handle":"Falcons RFC","url":"https://facebook.com/FalconsRFC"}]}}
+  </script>
+
+  <script src="js/script.js" defer></script>
+</body>
+</html>

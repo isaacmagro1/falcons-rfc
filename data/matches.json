@@ -1,0 +1,133 @@
+{
+  "season": "2026/27",
+  "note": "Kick-off times are announced by the Malta Rugby Football Union closer to each matchday.",
+  "matches": [
+    {
+      "id": "mrc-md1",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 1",
+      "date": "2026-10-10",
+      "time": null,
+      "opponent": "Wolves",
+      "venue": "Marsa Rugby Football Pitch"
+    },
+    {
+      "id": "mrc-md3",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 3",
+      "date": "2026-10-24",
+      "time": null,
+      "opponent": "Overseas",
+      "venue": "New Hibs Ground"
+    },
+    {
+      "id": "mrc-md4",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 4",
+      "date": "2026-11-21",
+      "time": null,
+      "opponent": "Stompers",
+      "venue": "Marsa Rugby Football Pitch"
+    },
+    {
+      "id": "mrc-md5",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 5",
+      "date": "2026-11-28",
+      "time": null,
+      "opponent": "Kavallieri",
+      "venue": "Marsa Rugby Football Pitch"
+    },
+    {
+      "id": "mrc-md6",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 6",
+      "date": "2026-12-05",
+      "time": null,
+      "opponent": "Wolves",
+      "venue": "New Hibs Ground"
+    },
+    {
+      "id": "mrc-md8",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 8",
+      "date": "2027-01-09",
+      "time": null,
+      "opponent": "Overseas",
+      "venue": null
+    },
+    {
+      "id": "mrc-md9",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 9",
+      "date": "2027-01-16",
+      "time": null,
+      "opponent": "Stompers",
+      "venue": "New Hibs Ground"
+    },
+    {
+      "id": "mrc-md10",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 10",
+      "date": "2027-01-23",
+      "time": null,
+      "opponent": "Kavallieri",
+      "venue": null
+    },
+    {
+      "id": "mrc-md11",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 11",
+      "date": "2027-01-30",
+      "time": null,
+      "opponent": "Wolves",
+      "venue": "New Hibs Ground"
+    },
+    {
+      "id": "mrc-md13",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 13",
+      "date": "2027-03-06",
+      "time": null,
+      "opponent": "Overseas",
+      "venue": "Marsa Rugby Football Pitch"
+    },
+    {
+      "id": "mrc-md14",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 14",
+      "date": "2027-03-13",
+      "time": null,
+      "opponent": "Stompers",
+      "venue": "Marsa Rugby Football Pitch"
+    },
+    {
+      "id": "mrc-md15",
+      "competition": "Malta Rugby Championship",
+      "round": "Matchday 15",
+      "date": "2027-03-20",
+      "time": null,
+      "opponent": "Kavallieri",
+      "venue": "Marsa Rugby Football Pitch"
+    },
+    {
+      "id": "cup-sf",
+      "competition": "Prestige Cup",
+      "round": "Semi-final",
+      "date": "2027-04-10",
+      "time": null,
+      "opponent": "Kavallieri",
+      "venue": null
+    },
+    {
+      "id": "cup-final",
+      "competition": "Prestige Cup",
+      "round": "Final",
+      "date": "2027-04-24",
+      "time": null,
+      "opponent": null,
+      "venue": null,
+      "note": "Finalists decided by the semi-finals"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "note": "Sponsor roster from the Falcons RFC branding guide, season 2026. Drop a logo file into assets/img/sponsors/ and set its path in \"logo\" to replace the monogram tile.",
+  "sponsors": [
+    {
+      "name": "Cisk Pilsner",
+      "tier": "main",
+      "tagline": "Main Sponsor — Season 2026/27",
+      "logo": null,
+      "website": null
+    },
+    {
+      "name": "Deefort",
+      "tier": "partner",
+      "tagline": "Official Kit Partner",
+      "logo": null,
+      "website": null
+    },
+    {
+      "name": "The San Paolo",
+      "tier": "partner",
+      "tagline": "San Pawl il-Baħar",
+      "logo": null,
+      "website": null
+    },
+    {
+      "name": "Dalton Reefer's Ltd",
+      "tier": "partner",
+      "tagline": null,
+      "logo": null,
+      "website": null
+    },
+    {
+      "name": "Portughes",
+      "tier": "partner",
+      "tagline": null,
+      "logo": null,
+      "website": null
+    },
+    {
+      "name": "Prestige",
+      "tier": "partner",
+      "tagline": "Prestige Cup Partner",
+      "logo": null,
+      "website": null
+    },
+    {
+      "name": "Lemon Soda",
+      "tier": "partner",
+      "tagline": null,
+      "logo": null,
+      "website": null
+    },
+    {
+      "name": "Martina's",
+      "tier": "partner",
+      "tagline": null,
+      "logo": null,
+      "website": null
+    },
+    {
+      "name": "Heels & Keys",
+      "tier": "partner",
+      "tagline": "Key Cutting & Shoe Repair",
+      "logo": null,
+      "website": null
+    }
+  ]
+}
