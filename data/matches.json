@@ -9,7 +9,8 @@
       "date": "2026-10-10",
       "time": null,
       "opponent": "Wolves",
-      "venue": "Marsa Rugby Football Pitch"
+      "venue": "Marsa Rugby Football Pitch",
+      "home": true
     },
     {
       "id": "mrc-md3",
@@ -18,7 +19,8 @@
       "date": "2026-10-24",
       "time": null,
       "opponent": "Overseas",
-      "venue": "New Hibs Ground"
+      "venue": "New Hibs Ground",
+      "home": false
     },
     {
       "id": "mrc-md4",
@@ -27,7 +29,8 @@
       "date": "2026-11-21",
       "time": null,
       "opponent": "Stompers",
-      "venue": "Marsa Rugby Football Pitch"
+      "venue": "Marsa Rugby Football Pitch",
+      "home": true
     },
     {
       "id": "mrc-md5",
@@ -36,7 +39,8 @@
       "date": "2026-11-28",
       "time": null,
       "opponent": "Kavallieri",
-      "venue": "Marsa Rugby Football Pitch"
+      "venue": "Marsa Rugby Football Pitch",
+      "home": true
     },
     {
       "id": "mrc-md6",
@@ -45,7 +49,8 @@
       "date": "2026-12-05",
       "time": null,
       "opponent": "Wolves",
-      "venue": "New Hibs Ground"
+      "venue": "New Hibs Ground",
+      "home": false
     },
     {
       "id": "mrc-md8",
@@ -54,7 +59,8 @@
       "date": "2027-01-09",
       "time": null,
       "opponent": "Overseas",
-      "venue": null
+      "venue": null,
+      "home": null
     },
     {
       "id": "mrc-md9",
@@ -63,7 +69,8 @@
       "date": "2027-01-16",
       "time": null,
       "opponent": "Stompers",
-      "venue": "New Hibs Ground"
+      "venue": "New Hibs Ground",
+      "home": false
     },
     {
       "id": "mrc-md10",
@@ -72,7 +79,8 @@
       "date": "2027-01-23",
       "time": null,
       "opponent": "Kavallieri",
-      "venue": null
+      "venue": null,
+      "home": null
     },
     {
       "id": "mrc-md11",
@@ -81,7 +89,8 @@
       "date": "2027-01-30",
       "time": null,
       "opponent": "Wolves",
-      "venue": "New Hibs Ground"
+      "venue": "New Hibs Ground",
+      "home": false
     },
     {
       "id": "mrc-md13",
@@ -90,7 +99,8 @@
       "date": "2027-03-06",
       "time": null,
       "opponent": "Overseas",
-      "venue": "Marsa Rugby Football Pitch"
+      "venue": "Marsa Rugby Football Pitch",
+      "home": true
     },
     {
       "id": "mrc-md14",
@@ -99,7 +109,8 @@
       "date": "2027-03-13",
       "time": null,
       "opponent": "Stompers",
-      "venue": "Marsa Rugby Football Pitch"
+      "venue": "Marsa Rugby Football Pitch",
+      "home": true
     },
     {
       "id": "mrc-md15",
@@ -108,7 +119,8 @@
       "date": "2027-03-20",
       "time": null,
       "opponent": "Kavallieri",
-      "venue": "Marsa Rugby Football Pitch"
+      "venue": "Marsa Rugby Football Pitch",
+      "home": true
     },
     {
       "id": "cup-sf",
@@ -117,7 +129,8 @@
       "date": "2027-04-10",
       "time": null,
       "opponent": "Kavallieri",
-      "venue": null
+      "venue": null,
+      "home": true
     },
     {
       "id": "cup-final",
@@ -127,7 +140,8 @@
       "time": null,
       "opponent": null,
       "venue": null,
-      "note": "Finalists decided by the semi-finals"
+      "note": "Finalists decided by the semi-finals",
+      "home": null
     }
   ]
 }

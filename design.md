@@ -133,8 +133,14 @@ the no-JS floor.
   round, big Anton date, KO + venue rows, oversized crests with KO chip.
 - **Rail**: every later fixture as a black card in a horizontal
   scroll-snap rail — drag with the mouse, swipe on touch, or use the square
-  arrow buttons beside the section title (Toulouse pattern). The right edge
+  arrow buttons that flank the rail (vertically centred over the cards;
+  they only render when the rail actually overflows). The right edge
   bleeds off-container so a cut card advertises the scroll.
+- **Home & away**: each fixture carries `home: true|false|null` in
+  `matches.json` (from the club fixtures sheet: Marsa → home, New Hibs →
+  away, TBC venues → null). The home side renders on the **left**, the away
+  side on the **right**, and the competition line appends "• Home"/"• Away".
+  Falcons away = Falcons on the right.
 - **Status logic** (`js/script.js`): compare `match.date` to today's local
   `YYYY-MM-DD` — equal = today, later = upcoming, earlier = past (dropped;
   a count note appears under the rail). Missing time renders "KO TBC",

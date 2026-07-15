@@ -161,16 +161,31 @@
     );
   }
 
+  /** Home side renders on the left, away side on the right (m.home === false
+      means Falcons are away, so they take the right slot). Unknown → left. */
   function teamsBlockHTML(m) {
     var opponentName = m.opponent || "Finalist TBC";
     var opponentLogo = m.opponent ? opponentLogoPath(m.opponent) : null;
     var ko = m.time ? esc(m.time) : "KO TBC";
+    var falcons = teamHTML("Falcons", PATHS.falconsMark);
+    var opponent = teamHTML(opponentName, opponentLogo);
+    var away = m.home === false;
+    var reading = away
+      ? esc(opponentName) + " versus Falcons"
+      : "Falcons versus " + esc(opponentName);
     return (
-      teamHTML("Falcons", PATHS.falconsMark) +
+      (away ? opponent : falcons) +
       '<span class="match-ko">' + ko +
-        '<span class="visually-hidden"> — Falcons versus ' + esc(opponentName) + "</span></span>" +
-      teamHTML(opponentName, opponentLogo)
+        '<span class="visually-hidden"> — ' + reading + "</span></span>" +
+      (away ? falcons : opponent)
     );
+  }
+
+  /** "Malta Rugby Championship • Matchday 3 • Away" */
+  function compLine(m) {
+    return esc(m.competition) +
+      (m.round ? " • " + esc(m.round) : "") +
+      (m.home === true ? " • Home" : m.home === false ? " • Away" : "");
   }
 
   /** The big "next up" panel at the top of the fixtures section. */
@@ -181,8 +196,7 @@
         (isToday ? ' aria-label="Today’s match"' : "") + ">" +
         "<div>" +
           '<span class="featured-card__badge">' + (isToday ? "Today’s match" : "Next up") + "</span>" +
-          '<p class="featured-card__comp">' + esc(m.competition) +
-            (m.round ? " • " + esc(m.round) : "") + "</p>" +
+          '<p class="featured-card__comp">' + compLine(m) + "</p>" +
           '<p class="featured-card__date">' + esc(formatDate(m.date)) + "</p>" +
           '<div class="featured-card__meta">' +
             "<span>" + ICONS.clock + (m.time ? "Kick-off <strong>&nbsp;" + esc(m.time) + "</strong>" : "Kick-off TBC") + "</span>" +
@@ -198,8 +212,7 @@
   function railCardHTML(m) {
     return (
       '<li class="reveal"><article class="match-card">' +
-        '<span class="match-card__comp">' + esc(m.competition) +
-          (m.round ? " • " + esc(m.round) : "") + "</span>" +
+        '<span class="match-card__comp">' + compLine(m) + "</span>" +
         '<span class="match-card__date">' + esc(formatDate(m.date)) + "</span>" +
         '<div class="match-card__teams">' + teamsBlockHTML(m) + "</div>" +
         '<span class="match-card__venue">' + ICONS.pin +
@@ -216,8 +229,7 @@
     card.innerHTML =
       '<p class="hero-card__label' + (isToday ? " hero-card__label--today" : "") + '">' +
         (isToday ? "Today’s match" : "Next match") + "</p>" +
-      '<p class="hero-card__comp">' + esc(m.competition) +
-        (m.round ? " • " + esc(m.round) : "") + "</p>" +
+      '<p class="hero-card__comp">' + compLine(m) + "</p>" +
       '<div class="hero-card__teams">' + teamsBlockHTML(m) + "</div>" +
       '<div class="hero-card__count" id="hero-count" hidden></div>' +
       '<div class="hero-card__meta">' +
@@ -299,7 +311,6 @@
     var featured = document.getElementById("match-featured");
     var railWrap = document.getElementById("matches-rail-wrap");
     var rail = document.getElementById("matches-rail");
-    var controls = document.getElementById("rail-controls");
     var note = document.getElementById("matches-note");
     if (!featured || !rail) { return; }
 
@@ -323,7 +334,6 @@
       var rest = visible.slice(1);
       if (rest.length) {
         rail.innerHTML = rest.map(railCardHTML).join("");
-        if (controls) { controls.hidden = rest.length < 3; }
         initRail();
       } else if (railWrap) {
         railWrap.hidden = true;
@@ -366,6 +376,10 @@
     function updateButtons() {
       if (!prev || !next) { return; }
       var max = track.scrollWidth - track.clientWidth;
+      // Arrows only exist when there is actually somewhere to scroll
+      var scrollable = max > 8;
+      prev.hidden = !scrollable;
+      next.hidden = !scrollable;
       prev.disabled = track.scrollLeft <= 4;
       next.disabled = track.scrollLeft >= max - 4;
     }
