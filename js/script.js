@@ -449,15 +449,18 @@
   function initReveals() {
     var targets = document.querySelectorAll(".reveal");
     if (REDUCED_MOTION || !("IntersectionObserver" in window)) {
+      // CSS downgrades .is-visible to a plain 200ms fade under reduced motion
       targets.forEach(function (el) { el.classList.add("is-visible"); });
       return;
     }
     var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
+      // Elements that enter the viewport together cascade in, 45ms apart
+      // (capped so late items never feel like they are lagging).
+      var visible = entries.filter(function (e) { return e.isIntersecting; });
+      visible.forEach(function (entry, i) {
+        entry.target.style.setProperty("--reveal-delay", Math.min(i * 45, 270) + "ms");
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
       });
     }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
     targets.forEach(function (el) { observer.observe(el); });

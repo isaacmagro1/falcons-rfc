@@ -135,15 +135,33 @@ line (max 18ch) + `.btn--dark`.
 
 ## 4. Motion
 
-- Durations 0.2s (`--t-fast`, hovers) and 0.5s (`--t-slow`, reveals/carousel),
-  easing `cubic-bezier(0.22, 0.61, 0.36, 1)`.
-- Scroll reveals: `.reveal` fades up 22px via one shared IntersectionObserver
-  (threshold 0.15), each element observed once.
-- Animated: transform/opacity only (GPU-friendly). The badge pulse animates
-  box-shadow, deliberately confined to one small element.
-- `prefers-reduced-motion: reduce` collapses every animation and transition,
-  hides the scroll cue, disables smooth scrolling and stops the carousel timer
-  (both CSS and JS check it).
+Built on design-engineering principles: strong custom easing curves (built-in
+CSS easings are too weak), UI transitions under 300ms, transform/opacity only.
+
+- **Curves:** `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` for entrances,
+  hovers and releases; `--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1)` for
+  on-screen movement (carousel slide). Never ease-in — it delays the initial
+  movement exactly when the user is watching.
+- **Durations:** press feedback `--t-press` 140ms · hovers/state `--t-fast`
+  200ms · carousel `--t-move` 380ms · reveals 450ms (entrances may sit above
+  300ms; interactions never do).
+- **Press feedback:** every pressable element scales down on `:active`
+  (buttons 0.97, carousel arrows 0.94) — the interface confirms it heard you.
+- **Scroll reveals:** keyframe animation (not transition) so it can never
+  fight hover/press transitions on the same element; fades up 12px over
+  450ms. Elements entering the viewport together stagger 45ms apart (capped
+  at 270ms) via a `--reveal-delay` custom property set by the observer.
+- **Hero entrance:** one-time load cascade (logo → eyebrow → title → tagline
+  → CTAs, 60ms steps). The next-match chip fades up via `@starting-style`
+  when JS un-hides it — nothing ever appears from nothing.
+- **Hover gating:** all hover motion sits behind
+  `@media (hover: hover) and (pointer: fine)` so touch devices never get
+  stuck hover states.
+- **Interruptibility:** the carousel uses a CSS transition, so rapid
+  prev/next clicks retarget smoothly instead of restarting.
+- **Reduced motion = fewer/gentler, not zero:** reveals and the hero cascade
+  become plain 200ms fades; lifts, presses, slides, the badge pulse, photo
+  zoom and scroll cue are removed; the carousel timer stops (JS checks too).
 
 ---
 

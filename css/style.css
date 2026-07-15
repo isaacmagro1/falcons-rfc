@@ -79,10 +79,13 @@
   /* Card corner notch — the triangle motif, cut into corners */
   --notch: 16px;
 
-  /* Motion */
-  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --t-fast: 0.2s;
-  --t-slow: 0.5s;
+  /* Motion — strong custom curves; built-in CSS easings are too weak.
+     UI transitions stay under 300ms so the site always feels responsive. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);      /* entrances, hovers, releases */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);  /* on-screen movement (carousel) */
+  --t-press: 140ms;  /* button press feedback */
+  --t-fast: 200ms;   /* hovers, small state changes */
+  --t-move: 380ms;   /* carousel slide */
 }
 
 *,
@@ -170,7 +173,7 @@ a {
   background: var(--gold);
   color: var(--black);
   font-weight: 700;
-  transition: top var(--t-fast) var(--ease);
+  transition: top var(--t-fast) var(--ease-out);
 }
 .skip-link:focus {
   top: var(--s-2);
@@ -217,15 +220,26 @@ a {
   color: var(--text-muted);
 }
 
-/* Scroll-reveal (JS adds .is-visible; motion removed for reduced-motion users) */
+/* Scroll-reveal — animation (not transition) so it can never fight the
+   hover/press transitions that live on the same elements. JS staggers
+   siblings via --reveal-delay (45ms steps). Runs once per element. */
 .reveal {
   opacity: 0;
-  transform: translateY(22px);
-  transition: opacity var(--t-slow) var(--ease), transform var(--t-slow) var(--ease);
 }
 .reveal.is-visible {
   opacity: 1;
-  transform: none;
+  animation: reveal-in 450ms var(--ease-out) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -241,18 +255,24 @@ a {
   text-transform: uppercase;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: background-color var(--t-fast) var(--ease),
-              color var(--t-fast) var(--ease),
-              border-color var(--t-fast) var(--ease),
-              transform var(--t-fast) var(--ease);
+  transition: transform var(--t-press) var(--ease-out),
+              background-color var(--t-fast) ease,
+              color var(--t-fast) ease,
+              border-color var(--t-fast) ease;
   /* Notched top-right corner — brand triangle motif */
   clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
 }
-.btn:hover {
-  transform: translateY(-2px);
-}
+/* Press feedback: the interface confirms it heard you */
 .btn:active {
-  transform: translateY(0);
+  transform: scale(0.97);
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  .btn:active {
+    transform: translateY(0) scale(0.97);
+  }
 }
 
 .btn--gold {
@@ -290,8 +310,8 @@ a {
   inset: 0 0 auto 0;
   z-index: 100;
   border-bottom: 1px solid transparent;
-  transition: background-color var(--t-fast) var(--ease),
-              border-color var(--t-fast) var(--ease);
+  transition: background-color var(--t-fast) ease,
+              border-color var(--t-fast) ease;
 }
 .site-header.is-scrolled {
   background: rgba(10, 10, 11, 0.88);
@@ -335,11 +355,13 @@ a {
   color: var(--text);
   padding: 0.5rem 0.25rem;
   border-bottom: 2px solid transparent;
-  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  transition: color 150ms ease, border-color 150ms ease;
 }
-.nav-links a:hover {
-  color: var(--gold);
-  border-bottom-color: var(--gold);
+@media (hover: hover) and (pointer: fine) {
+  .nav-links a:hover {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
 }
 
 @media (min-width: 768px) {
@@ -384,6 +406,20 @@ a {
   flex-direction: column;
   align-items: center;
 }
+
+/* One-time entrance, staggered 60ms per element. Page load is rare,
+   so it can afford delight — but stays fast (last element settles ~600ms). */
+.hero__logo,
+.hero__eyebrow,
+.hero__title,
+.hero__tagline,
+.hero__actions {
+  animation: reveal-in 550ms var(--ease-out) both;
+}
+.hero__eyebrow  { animation-delay: 60ms; }
+.hero__title    { animation-delay: 120ms; }
+.hero__tagline  { animation-delay: 180ms; }
+.hero__actions  { animation-delay: 240ms; }
 
 .hero__logo {
   width: clamp(230px, 55vw, 430px);
@@ -440,11 +476,29 @@ a {
   color: var(--text);
   font-size: 0.875rem;
   clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px);
-  transition: border-color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
+  opacity: 1;
+  transform: translateY(0);
+  transition: border-color var(--t-fast) ease,
+              background-color var(--t-fast) ease,
+              opacity 300ms var(--ease-out),
+              transform 300ms var(--ease-out);
 }
-.hero__next:hover {
-  border-color: var(--gold);
-  background: rgba(23, 23, 29, 0.85);
+/* Chip is un-hidden by JS once fixtures load — fade it up from rest,
+   never from nothing (no scale(0) entrances anywhere). */
+@starting-style {
+  .hero__next {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .hero__next:hover {
+    border-color: var(--gold);
+    background: rgba(23, 23, 29, 0.85);
+  }
+}
+.hero__next:active {
+  transform: scale(0.98);
 }
 .hero__next-label {
   font-weight: 700;
@@ -507,6 +561,8 @@ a {
   padding: var(--s-3);
   background: linear-gradient(160deg, var(--ink-800), var(--ink-900));
   border: 1px solid var(--line);
+  /* Hairline top highlight — reads as light hitting the card edge */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   clip-path: polygon(
     0 0,
     calc(100% - var(--notch)) 0,
@@ -515,11 +571,14 @@ a {
     var(--notch) 100%,
     0 calc(100% - var(--notch))
   );
-  transition: transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  transition: transform var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) ease;
 }
-.match-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--line-gold);
+@media (hover: hover) and (pointer: fine) {
+  .match-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--line-gold);
+  }
 }
 
 .match-card__top {
@@ -761,11 +820,15 @@ a {
 /* Carousel */
 .carousel__viewport {
   overflow: hidden;
+  /* Soft edges hint that the row continues beyond the frame */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
 }
 .carousel__track {
   display: flex;
-  /* width transitions handled by translateX in JS */
-  transition: transform var(--t-slow) var(--ease);
+  /* translateX set by JS. A transition (not keyframes) so rapid prev/next
+     clicks retarget smoothly instead of restarting from zero. */
+  transition: transform var(--t-move) var(--ease-in-out);
   margin-inline: calc(var(--s-1) * -1);
 }
 .carousel__slide {
@@ -785,6 +848,7 @@ a {
   padding: var(--s-3) var(--s-2);
   background: linear-gradient(160deg, var(--ink-800), var(--ink-900));
   border: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   clip-path: polygon(
     0 0,
     calc(100% - 12px) 0,
@@ -793,11 +857,17 @@ a {
     12px 100%,
     0 calc(100% - 12px)
   );
-  transition: transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  transition: transform var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) ease;
 }
-.sponsor-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--line-gold);
+@media (hover: hover) and (pointer: fine) {
+  .sponsor-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--line-gold);
+  }
+}
+a.sponsor-card:active {
+  transform: scale(0.98);
 }
 .sponsor-card__mono {
   display: flex;
@@ -847,14 +917,19 @@ a {
   color: var(--text);
   cursor: pointer;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
-              background-color var(--t-fast) var(--ease);
+  transition: transform var(--t-press) var(--ease-out),
+              border-color var(--t-fast) ease,
+              color var(--t-fast) ease,
+              background-color var(--t-fast) ease;
 }
-.carousel__btn:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+@media (hover: hover) and (pointer: fine) {
+  .carousel__btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
 }
 .carousel__btn:active {
+  transform: scale(0.94);
   background: rgba(253, 185, 21, 0.12);
 }
 .carousel__status {
@@ -963,13 +1038,19 @@ a {
   font-size: 0.875rem;
   letter-spacing: 0.06em;
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
-              transform var(--t-fast) var(--ease);
+  transition: transform var(--t-press) var(--ease-out),
+              border-color var(--t-fast) ease,
+              color var(--t-fast) ease;
 }
-.social-link:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .social-link:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: translateY(-2px);
+  }
+}
+.social-link:active {
+  transform: scale(0.97);
 }
 .social-link svg {
   flex-shrink: 0;
@@ -987,8 +1068,17 @@ a {
     0 calc(100% - var(--notch))
   );
 }
+.club-photo {
+  overflow: hidden;
+}
 .club-photo img {
   width: 100%;
+  transition: transform 600ms var(--ease-in-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .club-photo:hover img {
+    transform: scale(1.02);
+  }
 }
 .club-photo figcaption {
   padding: var(--s-2);
@@ -1009,6 +1099,7 @@ a {
   background: linear-gradient(160deg, var(--ink-800), var(--ink-900));
   border: 1px solid var(--line);
   border-left: 3px solid var(--gold);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .honour-card svg {
   flex-shrink: 0;
@@ -1076,10 +1167,12 @@ a {
 }
 .footer-col a {
   color: var(--text-muted);
-  transition: color var(--t-fast) var(--ease);
+  transition: color 150ms ease;
 }
-.footer-col a:hover {
-  color: var(--gold);
+@media (hover: hover) and (pointer: fine) {
+  .footer-col a:hover {
+    color: var(--gold);
+  }
 }
 
 .footer-legal {
@@ -1110,23 +1203,53 @@ a {
 
 /* --------------------------------------------------------------------------
    12. MOTION & ACCESSIBILITY
+   Reduced motion means fewer and gentler animations, not zero: gentle
+   opacity fades stay (they aid comprehension), movement goes.
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+
+  /* Reveals and hero entrance become plain fades — no translation */
+  .reveal.is-visible,
+  .hero__logo,
+  .hero__eyebrow,
+  .hero__title,
+  .hero__tagline,
+  .hero__actions {
+    animation: reveal-fade 200ms ease both;
+    animation-delay: 0ms;
   }
-  .reveal {
-    opacity: 1;
+
+  /* No movement: lifts, presses, slides, pulses, photo zoom, scroll cue */
+  .btn,
+  .btn:hover,
+  .btn:active,
+  .match-card:hover,
+  .sponsor-card:hover,
+  a.sponsor-card:active,
+  .carousel__btn:active,
+  .social-link:hover,
+  .social-link:active,
+  .hero__next,
+  .club-photo img,
+  .club-photo:hover img {
     transform: none;
+    transition-property: background-color, color, border-color, opacity;
+  }
+  .carousel__track {
+    transition-duration: 0.01ms;
+  }
+  .badge--today {
+    animation: none;
   }
   .hero__scroll {
     display: none;
   }
+}
+
+@keyframes reveal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
