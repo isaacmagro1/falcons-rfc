@@ -5,10 +5,12 @@
    Contents:
      1. Utilities & config
      2. Data loading (fetch data/*.json, inline <script> fallback for file://)
-     3. Fixtures — today / upcoming / past logic
-     4. Sponsors — spotlight + auto-rotating carousel
-     5. The Club — about, facts, honours, social links
-     6. Chrome — header state, scroll-reveal, footer year
+     3. Fixtures — featured panel, rail, hero card
+     4. Fixture rail — arrows, drag, snap
+     5. Sponsors — spotlight + rolling marquee
+     6. The Club — about, facts, honours, social links
+     7. Chrome — header, menu overlay, progress, parallax, reveals,
+        counters, scrollspy
 
    Testing tip: append ?date=YYYY-MM-DD to the URL to preview any day,
    e.g. index.html?date=2026-10-10 shows the TODAY'S MATCH state for MD1.
@@ -82,6 +84,19 @@
     return (letters.slice(0, 2).join("")) || "?";
   }
 
+  /** Swap broken opponent logos inside root for initials tiles. */
+  function attachLogoFallbacks(root) {
+    root.querySelectorAll("img[data-fallback]").forEach(function (img) {
+      img.addEventListener("error", function () {
+        var tile = document.createElement("span");
+        tile.className = "match-team__initials";
+        tile.setAttribute("aria-hidden", "true");
+        tile.textContent = img.getAttribute("data-fallback");
+        img.replaceWith(tile);
+      });
+    });
+  }
+
   /* ------------------------------------------------------------------------
      2. DATA LOADING
      fetch() is the source of truth; when it is unavailable (opening
@@ -118,10 +133,8 @@
      ------------------------------------------------------------------------ */
 
   var ICONS = {
-    calendar: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 2v3M17 2v3M3.5 9h17M5 4.5h14A1.5 1.5 0 0 1 20.5 6v13A1.5 1.5 0 0 1 19 20.5H5A1.5 1.5 0 0 1 3.5 19V6A1.5 1.5 0 0 1 5 4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
     clock: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-    pin: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 21s-6.5-5.5-6.5-10.3a6.5 6.5 0 0 1 13 0C18.5 15.5 12 21 12 21Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
-    trophy: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0V4ZM8 5H4.5v1A3.5 3.5 0 0 0 8 9.5M16 5h3.5v1A3.5 3.5 0 0 1 16 9.5M12 13v4m-3.5 3h7M9 20l.5-3h5l.5 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    pin: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 21s-6.5-5.5-6.5-10.3a6.5 6.5 0 0 1 13 0C18.5 15.5 12 21 12 21Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>'
   };
 
   /** Add status ("today" | "upcoming" | "past") relative to the given day. */
@@ -132,7 +145,7 @@
     });
   }
 
-  function teamHTML(name, logoSrc, isFalcons) {
+  function teamHTML(name, logoSrc) {
     var media;
     if (logoSrc) {
       // data-fallback lets the error handler swap in an initials tile
@@ -148,45 +161,80 @@
     );
   }
 
-  function matchCardHTML(m) {
-    var isToday = m.status === "today";
+  function teamsBlockHTML(m) {
     var opponentName = m.opponent || "Finalist TBC";
     var opponentLogo = m.opponent ? opponentLogoPath(m.opponent) : null;
-
-    var badge = isToday
-      ? '<span class="badge badge--today">Today’s Match</span>'
-      : '<span class="badge badge--upcoming">Upcoming</span>';
-
-    var meta =
-      '<div class="match-meta-row">' + ICONS.calendar +
-        "<span><strong>" + esc(formatDate(m.date)) + "</strong></span></div>" +
-      '<div class="match-meta-row">' + ICONS.clock +
-        "<span>" + (m.time ? "Kick-off <strong>" + esc(m.time) + "</strong>" : "Kick-off TBC") + "</span></div>" +
-      '<div class="match-meta-row">' + ICONS.pin +
-        "<span>" + (m.venue ? esc(m.venue) : "Venue TBC") + "</span></div>";
-
+    var ko = m.time ? esc(m.time) : "KO TBC";
     return (
-      '<article class="match-card' + (isToday ? " match-card--today" : "") + ' reveal"' +
+      teamHTML("Falcons", PATHS.falconsMark) +
+      '<span class="match-ko">' + ko +
+        '<span class="visually-hidden"> — Falcons versus ' + esc(opponentName) + "</span></span>" +
+      teamHTML(opponentName, opponentLogo)
+    );
+  }
+
+  /** The big "next up" panel at the top of the fixtures section. */
+  function featuredCardHTML(m) {
+    var isToday = m.status === "today";
+    return (
+      '<article class="featured-card' + (isToday ? " featured-card--today" : "") + ' reveal"' +
         (isToday ? ' aria-label="Today’s match"' : "") + ">" +
-        '<div class="match-card__top">' +
-          '<span class="match-card__comp">' + esc(m.competition) +
-            (m.round ? " • " + esc(m.round) : "") + "</span>" + badge +
+        "<div>" +
+          '<span class="featured-card__badge">' + (isToday ? "Today’s match" : "Next up") + "</span>" +
+          '<p class="featured-card__comp">' + esc(m.competition) +
+            (m.round ? " • " + esc(m.round) : "") + "</p>" +
+          '<p class="featured-card__date">' + esc(formatDate(m.date)) + "</p>" +
+          '<div class="featured-card__meta">' +
+            "<span>" + ICONS.clock + (m.time ? "Kick-off <strong>&nbsp;" + esc(m.time) + "</strong>" : "Kick-off TBC") + "</span>" +
+            "<span>" + ICONS.pin + esc(m.venue || "Venue TBC") + "</span>" +
+          "</div>" +
         "</div>" +
-        '<div class="match-card__teams">' +
-          teamHTML("Falcons", PATHS.falconsMark, true) +
-          '<span class="match-card__vs" aria-hidden="true">VS</span>' +
-          '<span class="visually-hidden">versus</span>' +
-          teamHTML(opponentName, opponentLogo, false) +
-        "</div>" +
-        '<div class="match-card__meta">' + meta + "</div>" +
+        '<div class="featured-card__teams">' + teamsBlockHTML(m) + "</div>" +
       "</article>"
     );
   }
 
+  /** Compact card for the horizontal rail. */
+  function railCardHTML(m) {
+    return (
+      '<li class="reveal"><article class="match-card">' +
+        '<span class="match-card__comp">' + esc(m.competition) +
+          (m.round ? " • " + esc(m.round) : "") + "</span>" +
+        '<span class="match-card__date">' + esc(formatDate(m.date)) + "</span>" +
+        '<div class="match-card__teams">' + teamsBlockHTML(m) + "</div>" +
+        '<span class="match-card__venue">' + ICONS.pin +
+          esc(m.venue || "Venue TBC") + "</span>" +
+      "</article></li>"
+    );
+  }
+
+  /** The docked match card in the hero. */
+  function renderHeroCard(m) {
+    var card = document.getElementById("hero-next");
+    if (!card || !m) { return; }
+    var isToday = m.status === "today";
+    card.innerHTML =
+      '<p class="hero-card__label' + (isToday ? " hero-card__label--today" : "") + '">' +
+        (isToday ? "Today’s match" : "Next match") + "</p>" +
+      '<p class="hero-card__comp">' + esc(m.competition) +
+        (m.round ? " • " + esc(m.round) : "") + "</p>" +
+      '<div class="hero-card__teams">' + teamsBlockHTML(m) + "</div>" +
+      '<div class="hero-card__meta">' +
+        "<span><strong>" + esc(formatDate(m.date)) + "</strong></span>" +
+        "<span>" + esc(m.venue || "Venue TBC") + "</span>" +
+      "</div>" +
+      '<a class="hero-card__link" href="#matches">Full fixture list &rarr;</a>';
+    attachLogoFallbacks(card);
+    card.hidden = false;
+  }
+
   function renderMatches(data, today) {
-    var grid = document.getElementById("matches-grid");
+    var featured = document.getElementById("match-featured");
+    var railWrap = document.getElementById("matches-rail-wrap");
+    var rail = document.getElementById("matches-rail");
+    var controls = document.getElementById("rail-controls");
     var note = document.getElementById("matches-note");
-    if (!grid) { return; }
+    if (!featured || !rail) { return; }
 
     var all = categorise(data.matches || [], today);
     var visible = all
@@ -199,23 +247,24 @@
       });
 
     if (visible.length === 0) {
-      grid.innerHTML =
+      featured.innerHTML =
         '<div class="matches-empty reveal"><strong>Season complete</strong>' +
         "New fixtures land here as soon as they are announced. Follow us on social for the news first.</div>";
+      if (railWrap) { railWrap.hidden = true; }
     } else {
-      grid.innerHTML = visible.map(matchCardHTML).join("");
+      featured.innerHTML = featuredCardHTML(visible[0]);
+      var rest = visible.slice(1);
+      if (rest.length) {
+        rail.innerHTML = rest.map(railCardHTML).join("");
+        if (controls) { controls.hidden = rest.length < 3; }
+        initRail();
+      } else if (railWrap) {
+        railWrap.hidden = true;
+      }
+      renderHeroCard(visible[0]);
     }
-
-    // Swap broken opponent logos for initials tiles
-    grid.querySelectorAll("img[data-fallback]").forEach(function (img) {
-      img.addEventListener("error", function () {
-        var tile = document.createElement("span");
-        tile.className = "match-team__initials";
-        tile.setAttribute("aria-hidden", "true");
-        tile.textContent = img.getAttribute("data-fallback");
-        img.replaceWith(tile);
-      });
-    });
+    attachLogoFallbacks(featured);
+    attachLogoFallbacks(rail);
 
     var played = all.length - visible.length;
     if (note && played > 0) {
@@ -224,213 +273,171 @@
       note.hidden = false;
     }
 
-    // Hero chip: the very next fixture
-    var next = visible[0];
-    var chip = document.getElementById("hero-next");
-    var chipDetail = document.getElementById("hero-next-detail");
-    if (chip && chipDetail && next) {
-      var opp = next.opponent || "Finalist TBC";
-      chipDetail.textContent =
-        (next.status === "today" ? "TODAY — " : "") +
-        "Falcons vs " + opp + " • " + formatDate(next.date) +
-        (next.venue ? " • " + next.venue : "");
-      chip.hidden = false;
+    // The fixtures stat mirrors the real fixture list
+    var stat = document.querySelector('[data-stat="fixtures"]');
+    if (stat && all.length) {
+      stat.setAttribute("data-count", String(all.length));
+      stat.textContent = String(all.length);
     }
   }
 
   /* ------------------------------------------------------------------------
-     4. SPONSORS
+     4. FIXTURE RAIL — arrow buttons, mouse drag, native touch scroll
      ------------------------------------------------------------------------ */
 
-  function sponsorCardHTML(s) {
-    var media = s.logo
-      ? '<img class="sponsor-card__logo" src="' + esc(s.logo) + '" alt="" loading="lazy" />'
-      : '<span class="sponsor-card__mono" aria-hidden="true">' + esc(initials(s.name)) + "</span>";
-    var inner =
-      media +
-      '<span class="sponsor-card__name">' + esc(s.name) + "</span>" +
-      '<span class="sponsor-card__tag">' + esc(s.tagline || "") + "</span>";
-    return s.website
-      ? '<a class="sponsor-card" href="' + esc(s.website) + '" target="_blank" rel="noopener">' + inner + "</a>"
-      : '<div class="sponsor-card">' + inner + "</div>";
+  function initRail() {
+    var track = document.getElementById("matches-rail");
+    var prev = document.getElementById("rail-prev");
+    var next = document.getElementById("rail-next");
+    if (!track) { return; }
+
+    function stepWidth() {
+      var card = track.querySelector("li");
+      return card ? card.getBoundingClientRect().width + 16 : 320;
+    }
+
+    function updateButtons() {
+      if (!prev || !next) { return; }
+      var max = track.scrollWidth - track.clientWidth;
+      prev.disabled = track.scrollLeft <= 4;
+      next.disabled = track.scrollLeft >= max - 4;
+    }
+
+    function scrollByStep(dir) {
+      track.scrollBy({
+        left: dir * stepWidth(),
+        behavior: REDUCED_MOTION ? "auto" : "smooth"
+      });
+    }
+
+    if (prev) { prev.addEventListener("click", function () { scrollByStep(-1); }); }
+    if (next) { next.addEventListener("click", function () { scrollByStep(1); }); }
+    track.addEventListener("scroll", updateButtons, { passive: true });
+    window.addEventListener("resize", updateButtons);
+    updateButtons();
+
+    // Mouse drag (touch already scrolls natively)
+    var startX = 0, startScroll = 0, dragging = false, moved = false;
+    track.addEventListener("pointerdown", function (e) {
+      if (e.pointerType !== "mouse" || e.button !== 0) { return; }
+      dragging = true;
+      moved = false;
+      startX = e.clientX;
+      startScroll = track.scrollLeft;
+      track.setPointerCapture(e.pointerId);
+    });
+    track.addEventListener("pointermove", function (e) {
+      if (!dragging) { return; }
+      var dx = e.clientX - startX;
+      if (Math.abs(dx) > 6) {
+        moved = true;
+        track.classList.add("is-dragging");
+      }
+      if (moved) { track.scrollLeft = startScroll - dx; }
+    });
+    function endDrag() {
+      if (!dragging) { return; }
+      dragging = false;
+      track.classList.remove("is-dragging"); // snap re-engages and settles
+    }
+    track.addEventListener("pointerup", endDrag);
+    track.addEventListener("pointercancel", endDrag);
+    track.addEventListener("dragstart", function (e) { e.preventDefault(); });
   }
+
+  /* ------------------------------------------------------------------------
+     5. SPONSORS — spotlight + rolling marquee
+     ------------------------------------------------------------------------ */
 
   function renderSpotlight(main) {
     var host = document.getElementById("sponsor-spotlight");
     if (!host || !main) { return; }
     var media = main.logo
       ? '<img src="' + esc(main.logo) + '" alt="' + esc(main.name) + ' logo" loading="lazy" />'
-      : '<p class="spotlight-card__name">' + esc(main.name) + "</p>";
+      : '<span class="spotlight-card__mono" aria-hidden="true">' + esc(initials(main.name)) + "</span>";
     host.innerHTML =
-      '<div class="spotlight-card reveal">' +
-        '<p class="spotlight-card__label">Main Sponsor</p>' + media +
-        '<p class="spotlight-card__tag">' + esc(main.tagline || "") + "</p>" +
+      '<div class="spotlight-card reveal">' + media +
+        "<div>" +
+          '<p class="spotlight-card__label">Main Sponsor</p>' +
+          '<p class="spotlight-card__name">' + esc(main.name) + "</p>" +
+          '<p class="spotlight-card__tag">' + esc(main.tagline || "") + "</p>" +
+        "</div>" +
       "</div>";
   }
 
-  /**
-   * Auto-rotating sponsor carousel.
-   * - 2 / 3 / 4 items per view (mobile / tablet / desktop)
-   * - advances one card every 5s, wraps around
-   * - pauses on hover, keyboard focus, hidden tab, or reduced-motion
-   */
-  function Carousel(root, items) {
-    this.root = root;
-    this.viewport = root.querySelector("#carousel-viewport");
-    this.track = root.querySelector("#carousel-track");
-    this.status = root.querySelector("#carousel-status");
-    this.count = items.length;
-    this.index = 0;
-    this.timer = null;
-
-    this.track.innerHTML = items.map(function (s) {
-      return '<li class="carousel__slide">' + sponsorCardHTML(s) + "</li>";
-    }).join("");
-
-    var self = this;
-    root.querySelector("#carousel-prev").addEventListener("click", function () { self.step(-1, true); });
-    root.querySelector("#carousel-next").addEventListener("click", function () { self.step(1, true); });
-
-    ["mouseenter", "focusin"].forEach(function (ev) {
-      root.addEventListener(ev, function () { self.pause(); });
-    });
-    ["mouseleave", "focusout"].forEach(function (ev) {
-      root.addEventListener(ev, function () { self.play(); });
-    });
-    document.addEventListener("visibilitychange", function () {
-      document.hidden ? self.pause() : self.play();
-    });
-
-    // Re-measure when the responsive per-view count changes
-    var queries = [window.matchMedia("(min-width: 1024px)"), window.matchMedia("(min-width: 768px)")];
-    queries.forEach(function (q) {
-      q.addEventListener("change", function () { self.update(); });
-    });
-
-    this.initDrag();
-    this.update();
-    this.play();
+  function sponsorItemHTML(s) {
+    var name = s.website
+      ? '<a class="sponsor-item__name" href="' + esc(s.website) + '" target="_blank" rel="noopener">' + esc(s.name) + "</a>"
+      : '<span class="sponsor-item__name">' + esc(s.name) + "</span>";
+    return (
+      '<li class="sponsor-item">' + name +
+      '<span class="sponsor-item__tag">' + esc(s.tagline || "") + "</span></li>"
+    );
   }
 
   /**
-   * Pointer-based drag/swipe. The track follows the finger 1:1; on release
-   * a quick flick (velocity > 0.11 px/ms) or a 50px pull changes slide,
-   * anything less snaps back. A 6px threshold separates taps from drags,
-   * and extra pointers mid-drag are ignored.
+   * Build the partner marquee: one real set for screen readers/keyboard,
+   * then enough aria-hidden copies that the -50% keyframe loops seamlessly
+   * at any viewport width. Speed is normalised to px/s, so the rail rolls
+   * at the same pace regardless of how many partners there are.
    */
-  Carousel.prototype.initDrag = function () {
-    var self = this;
-    var startX = 0, startTime = 0, dx = 0, pointerId = null;
-
-    function basePx() {
-      return -self.index * (self.viewport.clientWidth / self.perView());
+  function renderSponsorMarquee(partners) {
+    var marquee = document.getElementById("sponsor-marquee");
+    var track = document.getElementById("sponsor-track");
+    var hint = document.querySelector(".sponsors-hint");
+    if (!marquee || !track) { return; }
+    if (!partners.length) {
+      marquee.hidden = true;
+      if (hint) { hint.hidden = true; }
+      return;
     }
 
-    this.viewport.addEventListener("pointerdown", function (e) {
-      if (pointerId !== null || !e.isPrimary) { return; }
-      pointerId = e.pointerId;
-      startX = e.clientX;
-      startTime = Date.now();
-      dx = 0;
-      self.pause();
-      self.viewport.setPointerCapture(pointerId);
-    });
+    var setHTML = partners.map(sponsorItemHTML).join("");
+    track.innerHTML = setHTML;
 
-    this.viewport.addEventListener("pointermove", function (e) {
-      if (e.pointerId !== pointerId) { return; }
-      dx = e.clientX - startX;
-      if (Math.abs(dx) > 6) {
-        self.viewport.classList.add("is-dragging");
-        self.track.classList.add("no-transition");
-        self.track.style.transform = "translateX(" + (basePx() + dx) + "px)";
+    if (REDUCED_MOTION) { return; } // CSS wraps the single set into a grid
+
+    var setWidth = track.scrollWidth;
+    var copies = Math.max(1, Math.ceil(window.innerWidth / Math.max(setWidth, 1)));
+    var half = "";
+    for (var i = 0; i < copies; i++) { half += setHTML; }
+    track.innerHTML = half + half;
+
+    // Everything after the first set is decoration
+    var items = track.querySelectorAll(".sponsor-item");
+    items.forEach(function (item, idx) {
+      if (idx >= partners.length) {
+        item.setAttribute("aria-hidden", "true");
+        var link = item.querySelector("a");
+        if (link) { link.setAttribute("tabindex", "-1"); }
       }
     });
 
-    function release(e) {
-      if (e.pointerId !== pointerId) { return; }
-      pointerId = null;
-      self.viewport.classList.remove("is-dragging");
-      self.track.classList.remove("no-transition");
-
-      var velocity = Math.abs(dx) / Math.max(Date.now() - startTime, 1);
-      if (dx <= -50 || (dx < -6 && velocity > 0.11)) {
-        self.step(1, true);
-      } else if (dx >= 50 || (dx > 6 && velocity > 0.11)) {
-        self.step(-1, true);
-      } else {
-        self.update();   // snap back
-        self.play();
-      }
-      dx = 0;
-    }
-    this.viewport.addEventListener("pointerup", release);
-    this.viewport.addEventListener("pointercancel", release);
-    // Native image drag would hijack the pointer gesture (future sponsor logos)
-    this.viewport.addEventListener("dragstart", function (e) { e.preventDefault(); });
-  };
-
-  Carousel.prototype.perView = function () {
-    if (window.matchMedia("(min-width: 1024px)").matches) { return 4; }
-    if (window.matchMedia("(min-width: 768px)").matches) { return 3; }
-    return 2;
-  };
-
-  Carousel.prototype.maxIndex = function () {
-    return Math.max(0, this.count - this.perView());
-  };
-
-  Carousel.prototype.update = function () {
-    var per = this.perView();
-    this.track.style.setProperty("--per-view", per);
-    this.index = Math.min(this.index, this.maxIndex());
-    this.track.style.transform = "translateX(-" + (this.index * (100 / per)) + "%)";
-    if (this.status) {
-      var from = this.index + 1;
-      var to = Math.min(this.index + per, this.count);
-      this.status.textContent = from + "–" + to + " of " + this.count;
-    }
-  };
-
-  Carousel.prototype.step = function (dir, manual) {
-    var max = this.maxIndex();
-    this.index += dir;
-    if (this.index > max) { this.index = 0; }        // wrap forwards
-    if (this.index < 0) { this.index = max; }        // wrap backwards
-    this.update();
-    if (manual) { this.restart(); }
-  };
-
-  Carousel.prototype.play = function () {
-    if (REDUCED_MOTION || this.timer || this.maxIndex() === 0) { return; }
-    var self = this;
-    this.timer = window.setInterval(function () { self.step(1, false); }, 5000);
-  };
-
-  Carousel.prototype.pause = function () {
-    window.clearInterval(this.timer);
-    this.timer = null;
-  };
-
-  Carousel.prototype.restart = function () {
-    this.pause();
-    this.play();
-  };
+    track.style.animationDuration = ((setWidth * copies) / 70).toFixed(2) + "s";
+  }
 
   function renderSponsors(data) {
     var list = (data.sponsors || []);
     renderSpotlight(list.find(function (s) { return s.tier === "main"; }));
+    renderSponsorMarquee(list.filter(function (s) { return s.tier !== "main"; }));
+  }
 
-    var partners = list.filter(function (s) { return s.tier !== "main"; });
-    var root = document.getElementById("sponsor-carousel");
-    if (root && partners.length) {
-      new Carousel(root, partners);
-    } else if (root) {
-      root.hidden = true;
+  /** The hero ticker ships two copies in the HTML; on very wide screens
+      clone them until one half fills the viewport, then normalise speed. */
+  function initHeroMarquee() {
+    var track = document.querySelector(".hero__marquee .marquee__track");
+    if (!track || REDUCED_MOTION) { return; }
+    var half = track.scrollWidth / 2;
+    var copies = Math.max(1, Math.ceil(window.innerWidth / Math.max(half, 1)));
+    if (copies > 1) {
+      var html = track.innerHTML;
+      for (var i = 1; i < copies; i++) { track.innerHTML += html; }
     }
+    track.style.animationDuration = ((half * copies) / 55).toFixed(2) + "s";
   }
 
   /* ------------------------------------------------------------------------
-     5. THE CLUB
+     6. THE CLUB
      ------------------------------------------------------------------------ */
 
   var SOCIAL_ICONS = {
@@ -449,7 +456,9 @@
   function renderClub(info) {
     var about = document.getElementById("club-about");
     if (about && Array.isArray(info.about)) {
-      about.innerHTML = info.about.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("");
+      about.innerHTML = info.about.map(function (p) {
+        return '<p class="reveal">' + esc(p) + "</p>";
+      }).join("");
     }
 
     var facts = document.getElementById("club-facts");
@@ -461,7 +470,7 @@
         ["Cup", info.cup]
       ].filter(function (r) { return r[1]; });
       facts.innerHTML = rows.map(function (r) {
-        return '<div class="club-fact"><dt>' + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>";
+        return '<div class="club-fact reveal"><dt>' + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>";
       }).join("");
     }
 
@@ -474,9 +483,9 @@
     if (honours && Array.isArray(info.honours)) {
       honours.innerHTML = info.honours.map(function (h) {
         return (
-          '<div class="honour-card reveal">' + ICONS.trophy +
-          '<div><p class="honour-card__title">' + esc(h.title) + "</p>" +
-          '<p class="honour-card__detail">' + esc(h.detail) + "</p></div></div>"
+          '<li class="honour-row reveal">' +
+          '<div><p class="honour-row__title">' + esc(h.title) + "</p>" +
+          '<p class="honour-row__detail">' + esc(h.detail) + "</p></div></li>"
         );
       }).join("");
     }
@@ -491,21 +500,98 @@
   }
 
   /* ------------------------------------------------------------------------
-     6. CHROME — header, reveals, footer year
+     7. CHROME — header, menu, progress, parallax, reveals, counters, spy
      ------------------------------------------------------------------------ */
 
-  function initHeader() {
+  /** One rAF loop drives everything scroll-linked: header state,
+      the progress bar and the parallax layers. */
+  function initScrollLoop() {
     var header = document.querySelector(".site-header");
-    if (!header) { return; }
-    var update = function () {
-      header.classList.toggle("is-scrolled", window.scrollY > 24);
-    };
-    window.addEventListener("scroll", update, { passive: true });
+    var bar = document.getElementById("progress-bar");
+    var layers = REDUCED_MOTION ? [] :
+      Array.prototype.slice.call(document.querySelectorAll("[data-parallax]"));
+    var ticking = false;
+
+    function update() {
+      ticking = false;
+      var y = window.scrollY;
+
+      if (header) { header.classList.toggle("is-scrolled", y > 24); }
+
+      if (bar) {
+        var max = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.transform = "scaleX(" + (max > 0 ? Math.min(y / max, 1) : 0) + ")";
+      }
+
+      var vh = window.innerHeight;
+      layers.forEach(function (el) {
+        var parent = el.parentElement;
+        var r = parent.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) { return; }
+        var speed = parseFloat(el.getAttribute("data-parallax")) || 0.2;
+        // Zero when the section is centred in the viewport; the layer lags
+        // behind the scroll, clamped so it never exposes its own edge.
+        var shift = -(r.top + r.height / 2 - vh / 2) * speed;
+        var limit = r.height * 0.11;
+        shift = Math.max(-limit, Math.min(limit, shift));
+        el.style.transform = "translate3d(0," + shift.toFixed(1) + "px,0)";
+      });
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(update);
+      }
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     update();
   }
 
+  /** Mobile full-screen menu. */
+  function initMenu() {
+    var burger = document.getElementById("nav-burger");
+    var overlay = document.getElementById("menu-overlay");
+    if (!burger || !overlay) { return; }
+
+    function setOpen(open) {
+      burger.setAttribute("aria-expanded", String(open));
+      burger.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      document.body.style.overflow = open ? "hidden" : "";
+      if (open) {
+        overlay.hidden = false;
+        // Next frame so the entrance transition actually runs
+        window.requestAnimationFrame(function () {
+          overlay.classList.add("is-open");
+        });
+      } else {
+        overlay.classList.remove("is-open");
+        window.setTimeout(function () {
+          if (!overlay.classList.contains("is-open")) { overlay.hidden = true; }
+        }, 340);
+      }
+    }
+
+    burger.addEventListener("click", function () {
+      setOpen(burger.getAttribute("aria-expanded") !== "true");
+    });
+    overlay.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () { setOpen(false); });
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && burger.getAttribute("aria-expanded") === "true") {
+        setOpen(false);
+        burger.focus();
+      }
+    });
+    window.matchMedia("(min-width: 768px)").addEventListener("change", function (q) {
+      if (q.matches) { setOpen(false); }
+    });
+  }
+
   function initReveals() {
-    var targets = document.querySelectorAll(".reveal");
+    var targets = document.querySelectorAll(".reveal, .t-line");
     if (REDUCED_MOTION || !("IntersectionObserver" in window)) {
       // CSS downgrades .is-visible to a plain 200ms fade under reduced motion
       targets.forEach(function (el) { el.classList.add("is-visible"); });
@@ -522,6 +608,43 @@
       });
     }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
     targets.forEach(function (el) { observer.observe(el); });
+  }
+
+  /** Count the stat numbers up when they scroll into view. */
+  var countersStarted = false;
+  function initCounters() {
+    if (countersStarted) { return; }
+    countersStarted = true;
+
+    var nums = document.querySelectorAll(".stat__num [data-count]");
+    if (!nums.length) { return; }
+    if (REDUCED_MOTION || !("IntersectionObserver" in window)) { return; } // keep final values
+
+    function animate(el) {
+      var target = parseInt(el.getAttribute("data-count"), 10) || 0;
+      var start = null;
+      var DURATION = 1100;
+      function frame(ts) {
+        if (start === null) { start = ts; }
+        var t = Math.min((ts - start) / DURATION, 1);
+        var eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = String(Math.round(eased * target));
+        if (t < 1) { window.requestAnimationFrame(frame); }
+      }
+      window.requestAnimationFrame(frame);
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) { return; }
+        animate(entry.target);
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.6 });
+    nums.forEach(function (el) {
+      el.textContent = "0";
+      observer.observe(el);
+    });
   }
 
   function initFooterYear() {
@@ -560,9 +683,11 @@
      ------------------------------------------------------------------------ */
 
   document.addEventListener("DOMContentLoaded", function () {
-    initHeader();
+    initScrollLoop();
+    initMenu();
     initFooterYear();
     initScrollSpy();
+    initHeroMarquee();
 
     loadData()
       .then(function (data) {
@@ -570,16 +695,18 @@
         renderSponsors(data.sponsors);
         renderClub(data.teamInfo);
         initReveals();
+        initCounters();
       })
       .catch(function (err) {
         console.error("Falcons RFC: could not load site data.", err);
-        var grid = document.getElementById("matches-grid");
-        if (grid) {
-          grid.innerHTML =
+        var featured = document.getElementById("match-featured");
+        if (featured) {
+          featured.innerHTML =
             '<div class="matches-empty"><strong>Fixtures unavailable</strong>' +
             "Please refresh the page, or follow us on social for the latest fixtures.</div>";
         }
         initReveals();
+        initCounters();
       });
   });
 })();

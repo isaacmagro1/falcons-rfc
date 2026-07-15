@@ -21,7 +21,7 @@ copy of the data because browsers block `fetch()` on `file://`.
 ```
 index.html          Page markup + inline JSON fallback
 css/style.css       All styles (mobile-first; design tokens at the top)
-js/script.js        Fixtures logic, sponsor carousel, data loading
+js/script.js        Fixtures rail, sponsor marquee, motion system, data loading
 data/               ← edit these to update the site
   matches.json      Fixtures (dates, opponents, venues, times)
   sponsors.json     Sponsor roster (tier "main" = spotlight)

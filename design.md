@@ -2,7 +2,8 @@
 
 The reference for how the Falcons RFC website looks, feels and moves.
 Everything here was derived from the club's own assets: `Falcons Branding .pdf`,
-the logo SVGs, and the seven jersey-pattern photographs in `Patterns/`.
+the logo SVGs, and the seven jersey-pattern photographs in `Patterns/` — with
+layout language studied from top-flight club sites (Stade Toulousain, Harlequins).
 
 ---
 
@@ -16,22 +17,24 @@ and the jersey fabric photography.
 
 | Token          | Hex       | Use                                                    |
 | -------------- | --------- | ------------------------------------------------------ |
-| `--gold`       | `#FDB915` | Brand gold — CTAs, accents, badges, keylines            |
+| `--gold`       | `#FDB915` | Brand gold — CTAs, accents, badges, the fixtures field  |
 | `--gold-bright`| `#FFC531` | Hover state of gold elements                            |
 | `--gold-deep`  | `#D99C00` | Reserved for pressed states / dark-on-gold shading      |
 | `--black`      | `#0A0A0B` | Page background (never pure `#000` — avoids OLED smear) |
 | `--ink-900`    | `#101014` | Card & footer surfaces                                  |
 | `--ink-800`    | `#17171D` | Raised card gradient start                              |
-| `--ink-700`    | `#202028` | Highest surface (rarely used)                           |
 | `--text`       | `#F4F1E9` | Primary text — warm white, matches the jersey stripe    |
 | `--text-muted` | `#ABA79D` | Secondary text                                          |
 | `--text-faint` | `#7C786F` | Tertiary text, captions                                 |
+| `--on-gold`    | `#0A0A0B` | Text on the gold field                                  |
 
 Contrast (WCAG 2.1): gold on black ≈ 11.9:1, warm white on black ≈ 17:1,
-muted text on card ink ≈ 7.5:1 — all pass AA (most pass AAA).
+black on gold ≈ 11.9:1 — all pass AA (most pass AAA).
 
-**Rule: gold is an accent, not a background.** Large gold fields appear only
-inside pattern photography (banner) or the main CTA button.
+**The gold field.** One section — Fixtures — flips the scheme entirely: solid
+brand gold (over the `jersey-gold.jpg` fabric texture) with black cards on
+top. This is the visual centrepiece, the same move Harlequins make with their
+sky-blue matches section. Everywhere else, gold stays an accent.
 
 ### Typography
 
@@ -40,32 +43,34 @@ Self-hosted, converted to WOFF2 (`assets/fonts/`), loaded with
 
 | Face                        | Role                                            |
 | --------------------------- | ----------------------------------------------- |
-| **Anton** (400)             | Display: H1/H2, team names, stat values. Always uppercase, tight leading (0.98–1.1), letter-spacing 0.01–0.05em |
+| **Anton** (400)             | Display: hero, section titles, dates, team names, stats. Always uppercase, tight leading (0.92–1.1) |
 | **Glacial Indifference** 400| Body text, 1rem/1.6                             |
-| **Glacial Indifference** 700| Eyebrows, buttons, nav links, labels — uppercase with wide tracking (0.1–0.42em) |
+| **Glacial Indifference** 700| Eyebrows, buttons, nav links, labels — uppercase with wide tracking (0.1–0.35em) |
 
-Type scale (fluid): H1 `clamp(3rem, 11vw, 6rem)` · H2 `clamp(2.125rem, 5.5vw, 3.25rem)`
-· banner line `clamp(1.75rem, 5vw, 2.75rem)` · body `1rem` · meta `0.9375rem`
-· labels `0.6875–0.8125rem`.
+Type scale (fluid): hero `clamp(3.25rem, 13.5vw, 8.25rem)` · section titles
+`clamp(2.75rem, 8vw, 5rem)` · featured date `clamp(1.75rem, 4.5vw, 2.75rem)`
+· footer send-off `clamp(3.25rem, 12vw, 7.5rem)` · body `1rem` · labels
+`0.6875–0.8125rem`.
 
-The **eyebrow + big Anton headline + muted sub** stack is the signature header
-pattern used by every section.
+Signature moves:
+- **Numbered eyebrows** — `01 — Season 2026/27` above every section title.
+- **Outline + solid mix** — the hero's first line is stroke-only
+  (`-webkit-text-stroke`), the second solid with the last word in gold.
+- Stats use `font-variant-numeric: tabular-nums` so count-ups don't wobble.
 
 ### The triangle motif
 
 The jersey fabric is built from triangles, and the site echoes it in three ways:
 
-1. **Pattern photography as texture** — real fabric photos, always under a
-   dark overlay gradient so text stays AA-compliant:
-   - `pattern-hero.jpg` (dark slate triangles) → hero background
-   - `pattern-dark.jpg` (soft knit triangles) → fixtures section, spotlight card, footer (≈ 4–10% visibility through the overlay)
-   - `banner-split.jpg` (diagonal gold/black split) → matchday banner
-   - `jersey-detail.jpg`, `jersey-gold.jpg` → "photography" in The Club section
-2. **Notched corners** — cards, buttons and tiles clip one or two corners at
-   45° (`clip-path`, `--notch: 16px`; 12px on small elements). Match cards notch
-   top-right + bottom-left; buttons notch top-right only.
-3. **Angular details** — the scroll cue, badge clips and monogram tiles reuse
-   the same cut-corner language.
+1. **Pattern photography as texture** — real fabric photos, always under an
+   overlay so text stays AA-compliant: `pattern-hero.jpg` (hero, menu),
+   `jersey-gold.jpg` (the gold fixtures field), `pattern-dark.jpg` (stats,
+   footer), `banner-split.jpg` (spotlight, matchday banner),
+   `jersey-detail.jpg` (club photo).
+2. **Notched corners** — cards and buttons clip one or two corners at 45°
+   (`clip-path`, `--notch: 16px`; smaller on chips and buttons).
+3. **Angular details** — gold diamond separators in the marquees, the
+   kick-off chip, badge clips.
 
 Never place a pattern image behind text at full opacity.
 
@@ -73,95 +78,123 @@ Never place a pattern image behind text at full opacity.
 
 ## 2. Layout
 
-- Max content width **1200px** (`--container`), gutter 16px mobile / 24px ≥768px.
-- Spacing uses an **8px scale**: `--s-1` 8 · `--s-2` 16 · `--s-3` 24 · `--s-4` 32
-  · `--s-5` 48 · `--s-6` 64 · `--s-7` 96 · `--s-8` 128.
-- Section rhythm: `--s-6` padding on mobile, `--s-7` from tablet.
-- Breakpoints (mobile-first): base ≤767px · `768px` tablet · `1024px` desktop,
-  plus a `≤479px` micro-query that compacts the nav.
+Editorial, asymmetric, left-aligned — no centered hero stacks, no equal
+three-card rows.
 
-| Component      | Mobile      | ≥768px          | ≥1024px        |
-| -------------- | ----------- | --------------- | -------------- |
-| Matches grid   | 1 column    | 2 columns       | 3 columns      |
-| Today's match  | full width  | spans all cols  | spans all cols |
-| Carousel       | 2 per view  | 3 per view      | 4 per view     |
-| Club section   | stacked     | stacked         | 7/5 split      |
-| Footer grid    | 2 columns   | 4 columns       | 4 columns      |
+- Max content width **1240px** (`--container`), gutter 16px mobile / 32px ≥768px.
+- Spacing uses an **8px scale** (`--s-1` … `--s-8`).
+- Breakpoints (mobile-first): base ≤767px · `768px` tablet · `1024px` desktop.
+
+| Region         | Mobile              | ≥768px             | ≥1024px                  |
+| -------------- | ------------------- | ------------------ | ------------------------ |
+| Header         | brand + burger      | brand + links + CTA| same                     |
+| Hero           | stacked, card below | stacked            | 7/5 grid, card docked right |
+| Featured match | stacked             | 5/7 split          | 5/7 split                |
+| Fixture rail   | horizontal scroll (78vw cards) | same (300px cards) | same + arrows |
+| Stats          | 2×2                 | 4-up               | 4-up                     |
+| Club           | stacked             | stacked            | 6/5 split                |
+| Footer grid    | 2 columns           | 4 columns          | 4 columns                |
+
+Page flow: hero (dark) → ticker → **fixtures (gold)** → stats (dark) →
+partners (dark) → club (dark) → matchday banner (photo) → footer. The gold
+block breaks the dark monotone exactly once, like a poster fold.
 
 ---
 
 ## 3. Components
 
-### Match card
-Surface `ink-800→ink-900` gradient, 1px `--line` border, notched corners.
-Rows: competition/round + status badge → Falcons mark **VS** opponent logo →
-divider → date / kick-off / venue rows with 16px gold inline SVG icons.
-Hover: `translateY(-4px)` + gold border tint.
+### Header
+Thin utility topbar (location / season) that collapses once scrolled; solid
+nav with brand, links, gold CTA; 3px gold **reading-progress bar** fixed above
+everything. On mobile the links move into a **full-screen overlay menu**
+(burger → X, staggered link entrance, Esc/link-tap closes, body scroll locks).
 
-**Today's match**: spans the full grid row, gold border + soft gold glow
-(`--glow-gold`), pulsing solid-gold `TODAY'S MATCH` badge, enlarged logos and
-type, meta row centred horizontally on desktop.
+### Hero
+Left-aligned editorial block: crest eyebrow → outline/solid display title →
+tagline → two CTAs. A **next-match card** docks right on desktop (crest v
+crest, KO chip, date/venue, link to fixtures) — rendered by JS from the same
+data as the fixtures. The base of the hero carries a rolling **ticker** of
+club lines. Background parallaxes slowly behind it all.
 
-**Status logic** (in `js/script.js`): compare `match.date` to today's local
-`YYYY-MM-DD` string — equal = today, later = upcoming, earlier = past (hidden;
-a count note appears under the grid). Missing time renders "Kick-off TBC",
-missing venue "Venue TBC", missing opponent (cup final) renders an initials
-tile + "Finalist TBC".
+### Fixtures — the gold field
+- **Featured panel**: the next fixture (or today's match) as a full-width
+  black card — badge (`NEXT UP` / pulsing `TODAY'S MATCH`), competition +
+  round, big Anton date, KO + venue rows, oversized crests with KO chip.
+- **Rail**: every later fixture as a black card in a horizontal
+  scroll-snap rail — drag with the mouse, swipe on touch, or use the square
+  arrow buttons beside the section title (Toulouse pattern). The right edge
+  bleeds off-container so a cut card advertises the scroll.
+- **Status logic** (`js/script.js`): compare `match.date` to today's local
+  `YYYY-MM-DD` — equal = today, later = upcoming, earlier = past (dropped;
+  a count note appears under the rail). Missing time renders "KO TBC",
+  missing venue "Venue TBC", missing opponent an initials tile + "Finalist TBC".
+- Empty state: "Season complete" black panel.
 
 ### Opponent logos
 `assets/img/opponents/<slug>.png` where slug = opponent name lowercased,
 non-alphanumerics → `-`. On image error, JS swaps in a gold **initials tile** —
-so a new opponent works with zero code changes, with or without a logo file.
+a new opponent works with zero code changes, with or without a logo file.
 
-### Sponsor spotlight & carousel
-Main sponsor (tier `"main"`) gets the full-width spotlight card: gold top
-keyline, `MAIN SPONSOR` eyebrow, Anton name (or logo image when provided).
-Partners render in the carousel: monogram tile (initials in Anton gold on an
-8% gold field) + name + tagline. Auto-advances every **5s**, one card at a
-time with wrap-around; pauses on hover, keyboard focus and hidden tabs;
-disabled entirely under reduced motion. Prev/next buttons + an `aria-live`
-"1–4 of 8" status between them.
+### Stats band
+Four gold-keyline stats (fixtures, years, teams, senior clubs) whose numbers
+**count up** (~1.1s, ease-out cubic) when scrolled into view. The fixtures
+figure is derived from `matches.json` at runtime.
+
+### Sponsors
+Main sponsor (tier `"main"`) gets the split **spotlight card** (monogram or
+logo + `MAIN SPONSOR` label + Anton name). Partners roll in a full-bleed
+**marquee** — Anton names with taglines, gold diamond separators — that
+scrolls continuously (~70px/s, duration normalised to content width), pauses
+on hover/focus, and duplicates its content only enough to loop seamlessly.
+The first copy is the real one; clones are `aria-hidden` with untabbable links.
+
+### The Club
+Editorial split: about copy (lead paragraph brighter than the rest), facts as
+a **hairline ledger** (label left, Anton value right), social buttons; then
+the jersey photo (clip-path wipe reveal) and honours as a **numbered index**
+(`01`–`04`, gold counters, hover nudge).
 
 ### Buttons
-`.btn--gold` (primary, black text on gold), `.btn--ghost` (outline),
-`.btn--dark` (black with gold border — safe on photographic backgrounds).
-All uppercase Glacial bold, notched top-right corner, hover lift of 2px.
-
-### Banner
-`banner-split.jpg` under a left-heavy dark gradient; eyebrow + short Anton
-line (max 18ch) + `.btn--dark`.
+`.btn--gold` (primary), `.btn--ghost` (outline), `.btn--dark` (black w/ gold
+border — for photographic backgrounds). All uppercase Glacial bold, notched
+top-right corner, hover lift, `scale(0.97)` press.
 
 ---
 
 ## 4. Motion
 
-Built on design-engineering principles: strong custom easing curves (built-in
-CSS easings are too weak), UI transitions under 300ms, transform/opacity only.
+Built on design-engineering principles: strong custom easing curves, UI
+transitions under 300ms, transform/opacity only, everything interruptible
+where it can be. **Nothing on the page is fully static** — every section
+either moves (marquees, parallax) or enters with motion (reveals, count-ups).
 
 - **Curves:** `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` for entrances,
   hovers and releases; `--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1)` for
-  on-screen movement (carousel slide). Never ease-in — it delays the initial
-  movement exactly when the user is watching.
-- **Durations:** press feedback `--t-press` 140ms · hovers/state `--t-fast`
-  200ms · carousel `--t-move` 380ms · reveals 450ms (entrances may sit above
-  300ms; interactions never do).
-- **Press feedback:** every pressable element scales down on `:active`
-  (buttons 0.97, carousel arrows 0.94) — the interface confirms it heard you.
-- **Scroll reveals:** keyframe animation (not transition) so it can never
-  fight hover/press transitions on the same element; fades up 12px over
-  450ms. Elements entering the viewport together stagger 45ms apart (capped
-  at 270ms) via a `--reveal-delay` custom property set by the observer.
-- **Hero entrance:** one-time load cascade (logo → eyebrow → title → tagline
-  → CTAs, 60ms steps). The next-match chip fades up via `@starting-style`
-  when JS un-hides it — nothing ever appears from nothing.
-- **Hover gating:** all hover motion sits behind
-  `@media (hover: hover) and (pointer: fine)` so touch devices never get
-  stuck hover states.
-- **Interruptibility:** the carousel uses a CSS transition, so rapid
-  prev/next clicks retarget smoothly instead of restarting.
-- **Reduced motion = fewer/gentler, not zero:** reveals and the hero cascade
-  become plain 200ms fades; lifts, presses, slides, the badge pulse, photo
-  zoom and scroll cue are removed; the carousel timer stops (JS checks too).
+  on-screen movement. Never ease-in.
+- **Durations:** press 140ms · hovers 200ms · reveals 500ms · title masks
+  700ms · clip reveals 800ms (entrances may sit above 300ms; interactions
+  never do).
+- **Always moving:** the hero ticker and partner marquee roll continuously
+  (linear, speed normalised to px/s), pausing on hover/focus so they can be
+  read. The scroll-progress bar and header state track every scroll.
+- **Scroll-linked:** one rAF loop drives header shrink, the progress bar and
+  the **parallax layers** (`data-parallax` on hero + banner backgrounds;
+  offset zeroed at viewport centre and clamped so edges never show).
+- **Entrances:** `.reveal` keyframe fade-up with 45ms sibling stagger;
+  `.t-line` line-mask slide for display titles (transition, so it stays
+  interruptible); `.reveal--clip` wipe for photography; hero cascade on load
+  (70ms steps); overlay menu links stagger via `--i` custom property.
+  All hidden-before-reveal states are scoped under a `.js` root class so the
+  page is fully readable without JavaScript.
+- **Feedback:** every pressable element scales down on `:active` (buttons
+  0.97, arrows/burger 0.94). Hover motion sits behind
+  `(hover: hover) and (pointer: fine)`.
+- **Count-ups:** stats animate 0→value on first view (IntersectionObserver),
+  skipped entirely under reduced motion (final values are in the HTML).
+- **Reduced motion = fewer/gentler, not zero:** reveals become plain 200ms
+  fades; marquees stop and wrap into static rows (hero ticker hides); the
+  parallax loop never registers; lifts, presses, pulses, zooms and the badge
+  pulse are stripped; rail scrolling snaps without smooth behaviour.
 
 ---
 
@@ -171,12 +204,17 @@ CSS easings are too weak), UI transitions under 300ms, transform/opacity only.
   skip link to `#matches`; `scroll-padding-top` keeps anchors clear of the
   fixed header.
 - Keyboard: all interactive elements are native `<a>`/`<button>`; visible
-  gold `:focus-visible` outline; carousel viewport is focusable and pauses
-  rotation while focused.
+  gold `:focus-visible` outline (black variant on the gold field); rail
+  arrows are real buttons with disabled states; the overlay menu closes on
+  Esc and returns focus to the burger.
 - Screen readers: decorative images/icons get `alt=""`/`aria-hidden`; the
-  "VS" glyph is duplicated as visually-hidden "versus"; carousel status and
-  match grid are `aria-live="polite"`.
-- `<noscript>` block carries the season-opener facts.
+  ticker is `aria-hidden`; marquee clones are `aria-hidden` with
+  `tabindex="-1"` links; the KO chip carries a visually-hidden
+  "Falcons versus X"; featured match region is `aria-live="polite"`.
+- A global `[hidden] { display: none !important }` guard keeps the attribute
+  authoritative over component display rules.
+- `<noscript>` block carries the season-opener facts; static stat values and
+  un-scoped reveal states keep the page readable without JS.
 
 ---
 
@@ -184,11 +222,11 @@ CSS easings are too weak), UI transitions under 300ms, transform/opacity only.
 
 All content is data-driven from `data/`:
 
-| File              | Drives                                    |
-| ----------------- | ------------------------------------------ |
-| `matches.json`    | Fixture cards, hero next-match chip         |
-| `sponsors.json`   | Spotlight + carousel                        |
-| `team-info.json`  | About copy, facts grid, honours, social links (header + footer) |
+| File              | Drives                                              |
+| ----------------- | --------------------------------------------------- |
+| `matches.json`    | Hero match card, featured panel, rail, fixtures stat |
+| `sponsors.json`   | Spotlight + partner marquee                          |
+| `team-info.json`  | About copy, facts ledger, honours index, social links |
 
 `fetch()` is the source of truth; a build-time copy of the same JSON lives in
 `index.html` (`<script type="application/json" id="fallback-data">`) so the

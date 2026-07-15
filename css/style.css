@@ -2,10 +2,11 @@
    FALCONS RFC — style.css
    Design system: see design.md
    Structure:
-     1. Fonts            5. Header / Nav       9. Banner
-     2. Tokens & reset   6. Hero              10. The Club
-     3. Utilities        7. Fixtures          11. Footer
-     4. Buttons          8. Sponsors          12. Motion & a11y
+     1. Fonts             6. Menu overlay      11. Sponsors
+     2. Tokens & reset    7. Hero              12. The Club
+     3. Utilities         8. Marquee           13. Banner
+     4. Buttons           9. Fixtures (gold)   14. Footer
+     5. Header / Nav     10. Stats             15. Motion & a11y
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -48,10 +49,15 @@
   --ink-800: #17171D;
   --ink-700: #202028;
 
-  /* Text */
+  /* Text on dark */
   --text:       #F4F1E9;
   --text-muted: #ABA79D;
   --text-faint: #7C786F;
+
+  /* Text on the gold field */
+  --on-gold:       #0A0A0B;
+  --on-gold-muted: rgba(10, 10, 11, 0.66);
+  --on-gold-line:  rgba(10, 10, 11, 0.22);
 
   /* Lines & glows */
   --line:      rgba(255, 255, 255, 0.09);
@@ -73,8 +79,9 @@
   --s-8: 8rem;     /* 128 */
 
   /* Layout */
-  --container: 1200px;
+  --container: 1240px;
   --gutter: 1rem;
+  --header-h: 4rem;
 
   /* Card corner notch — the triangle motif, cut into corners */
   --notch: 16px;
@@ -82,10 +89,10 @@
   /* Motion — strong custom curves; built-in CSS easings are too weak.
      UI transitions stay under 300ms so the site always feels responsive. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);      /* entrances, hovers, releases */
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);  /* on-screen movement (carousel) */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);  /* on-screen movement */
   --t-press: 140ms;  /* button press feedback */
   --t-fast: 200ms;   /* hovers, small state changes */
-  --t-move: 380ms;   /* carousel slide */
+  --t-move: 380ms;   /* larger movement */
 }
 
 *,
@@ -99,7 +106,7 @@
 html {
   scroll-behavior: smooth;
   /* Fixed header height — keeps anchor targets clear of the nav */
-  scroll-padding-top: 4.5rem;
+  scroll-padding-top: 4.75rem;
 }
 
 body {
@@ -118,8 +125,13 @@ img {
   display: block;
 }
 
-ul {
+ul, ol {
   list-style: none;
+}
+
+/* The hidden attribute always wins, even over display:flex components */
+[hidden] {
+  display: none !important;
 }
 
 a {
@@ -155,7 +167,7 @@ button {
 }
 
 @media (min-width: 768px) {
-  :root { --gutter: 1.5rem; }
+  :root { --gutter: 2rem; }
 }
 
 .visually-hidden {
@@ -174,7 +186,7 @@ button {
   position: absolute;
   top: -100%;
   left: var(--s-2);
-  z-index: 200;
+  z-index: 400;
   padding: var(--s-1) var(--s-2);
   background: var(--gold);
   color: var(--black);
@@ -187,23 +199,21 @@ button {
 
 /* Section rhythm */
 .section {
-  padding-block: var(--s-6);
+  padding-block: var(--s-6) var(--s-7);
 }
 @media (min-width: 768px) {
-  .section { padding-block: var(--s-7); }
+  .section { padding-block: var(--s-7) var(--s-8); }
 }
 
-/* Section headers */
+/* Section headers — editorial: numbered eyebrow, huge left-set display title */
 .section-head {
-  max-width: 620px;
-  margin-inline: auto;
   margin-bottom: var(--s-5);
-  text-align: center;
 }
-.section-head--left {
-  margin-inline: 0;
-  margin-bottom: var(--s-3);
-  text-align: left;
+.section-head__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-3);
 }
 .section-head__eyebrow {
   font-weight: 700;
@@ -211,41 +221,97 @@ button {
   letter-spacing: 0.35em;
   text-transform: uppercase;
   color: var(--gold);
-  margin-bottom: var(--s-1);
+  margin-bottom: var(--s-2);
 }
 .section-head__title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.125rem, 5.5vw, 3.25rem);
-  line-height: 1.05;
-  letter-spacing: 0.015em;
+  font-size: clamp(2.75rem, 8vw, 5rem);
+  line-height: 0.96;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 .section-head__sub {
-  margin-top: var(--s-2);
+  margin-top: var(--s-3);
   color: var(--text-muted);
+  max-width: 52ch;
+}
+
+/* Line-mask reveal for display titles: the text slides up from behind
+   its own baseline. Transition (not keyframes) so it stays interruptible.
+   Hidden states are scoped to .js (set by an inline <head> script) so
+   nothing is ever invisible when JavaScript doesn't run. */
+.t-line {
+  display: block;
+  overflow: hidden;
+  padding-block-end: 0.08em; /* keep descenders un-clipped */
+}
+.t-line > span {
+  display: block;
+  transition: transform 700ms var(--ease-out);
+}
+.js .t-line > span {
+  transform: translateY(112%);
+}
+.js .t-line.is-visible > span {
+  transform: translateY(0);
 }
 
 /* Scroll-reveal — animation (not transition) so it can never fight the
    hover/press transitions that live on the same elements. JS staggers
    siblings via --reveal-delay (45ms steps). Runs once per element. */
-.reveal {
+.js .reveal {
   opacity: 0;
 }
 .reveal.is-visible {
   opacity: 1;
-  animation: reveal-in 450ms var(--ease-out) both;
+  animation: reveal-in 500ms var(--ease-out) both;
   animation-delay: var(--reveal-delay, 0ms);
 }
 @keyframes reveal-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Image clip reveal — the photo wipes up from its bottom edge */
+.reveal--clip.is-visible {
+  animation: reveal-clip 800ms var(--ease-out) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+@keyframes reveal-clip {
+  from {
+    opacity: 1;
+    clip-path: inset(100% 0 0 0);
+    transform: none;
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+
+/* Reading progress bar */
+.progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 300;
+  pointer-events: none;
+}
+.progress span {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
 }
 
 /* --------------------------------------------------------------------------
@@ -314,29 +380,52 @@ button {
 .site-header {
   position: fixed;
   inset: 0 0 auto 0;
-  z-index: 100;
+  z-index: 200;
   border-bottom: 1px solid transparent;
   transition: background-color var(--t-fast) ease,
               border-color var(--t-fast) ease;
 }
 .site-header.is-scrolled {
-  background: rgba(10, 10, 11, 0.88);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  background: rgba(10, 10, 11, 0.9);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   border-bottom-color: var(--line);
+}
+
+/* Utility strip — collapses away once you scroll */
+.topbar {
+  max-height: 2.25rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  transition: max-height 300ms var(--ease-in-out), opacity 200ms ease;
+}
+.site-header.is-scrolled .topbar {
+  max-height: 0;
+  opacity: 0;
+}
+.topbar__inner {
+  display: flex;
+  justify-content: space-between;
+  padding-block: 0.4375rem;
+  font-weight: 700;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
 }
 
 .site-nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 4rem;
+  gap: var(--s-3);
+  height: var(--header-h);
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
   gap: 0.625rem;
+  margin-right: auto;
 }
 .nav-brand img {
   width: 2.375rem;
@@ -348,14 +437,18 @@ button {
   text-transform: uppercase;
   color: var(--text);
 }
+.nav-brand__word em {
+  font-style: normal;
+  color: var(--gold);
+}
 
 .nav-links {
   display: flex;
-  gap: var(--s-2);
+  gap: var(--s-4);
 }
 .nav-links a {
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text);
@@ -376,206 +469,258 @@ button {
   border-bottom-color: var(--gold);
 }
 
-@media (min-width: 768px) {
-  .nav-links { gap: var(--s-4); }
-  .nav-links a { font-size: 0.8125rem; }
+.nav-cta {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.8125rem;
 }
 
-/* Very narrow screens: drop the wordmark, tighten the links so all
-   three stay reachable without a hamburger */
+/* Burger — mobile only */
+.nav-burger {
+  display: none;
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition: transform var(--t-press) var(--ease-out), border-color var(--t-fast) ease;
+}
+.nav-burger:active {
+  transform: scale(0.94);
+}
+.nav-burger span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.25rem;
+  height: 2px;
+  background: var(--text);
+  transition: transform 280ms var(--ease-out), background-color var(--t-fast) ease;
+}
+.nav-burger span:nth-child(1) { transform: translate(-50%, calc(-50% - 4px)); }
+.nav-burger span:nth-child(2) { transform: translate(-50%, calc(-50% + 4px)); }
+.nav-burger[aria-expanded="true"] {
+  border-color: var(--line-gold);
+}
+.nav-burger[aria-expanded="true"] span {
+  background: var(--gold);
+}
+.nav-burger[aria-expanded="true"] span:nth-child(1) { transform: translate(-50%, -50%) rotate(45deg); }
+.nav-burger[aria-expanded="true"] span:nth-child(2) { transform: translate(-50%, -50%) rotate(-45deg); }
+
+@media (max-width: 767px) {
+  .nav-links,
+  .nav-cta { display: none; }
+  .nav-burger { display: block; }
+}
 @media (max-width: 479px) {
-  .nav-brand__word { display: none; }
-  .nav-links { gap: 0.75rem; }
-  .nav-links a { font-size: 0.6875rem; letter-spacing: 0.1em; }
+  .topbar__inner span:last-child { display: none; }
 }
 
 /* --------------------------------------------------------------------------
-   6. HERO
+   6. MENU OVERLAY (mobile)
+   -------------------------------------------------------------------------- */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(var(--header-h) + 3rem) var(--gutter) var(--s-5);
+  background:
+    linear-gradient(180deg, rgba(10, 10, 11, 0.96), rgba(10, 10, 11, 0.99)),
+    url("../assets/img/pattern-hero.jpg") center / cover no-repeat;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 320ms var(--ease-out), visibility 0s linear 320ms;
+}
+.menu-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 320ms var(--ease-out);
+}
+
+.menu-overlay__links li {
+  border-bottom: 1px solid var(--line);
+}
+.menu-overlay__links a {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  padding-block: var(--s-2);
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 11vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text);
+  transition: color var(--t-fast) ease;
+}
+.menu-overlay__links a:active {
+  color: var(--gold);
+}
+.menu-overlay__links a i {
+  font-style: normal;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+}
+
+.menu-overlay__foot {
+  display: grid;
+  gap: var(--s-2);
+  justify-items: start;
+}
+.menu-overlay__foot p {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* Staggered entrance for the overlay content */
+.menu-overlay li,
+.menu-overlay__foot {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 360ms var(--ease-out), transform 360ms var(--ease-out);
+}
+.menu-overlay.is-open li,
+.menu-overlay.is-open .menu-overlay__foot {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: calc(60ms + var(--i, 0) * 55ms);
+}
+
+/* --------------------------------------------------------------------------
+   7. HERO
    -------------------------------------------------------------------------- */
 .hero {
   position: relative;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  padding-block: var(--s-7) var(--s-6);
+  overflow: hidden;
+  background: var(--black);
+}
+
+/* Parallax layer — oversized so the shift never exposes an edge */
+.hero__bg {
+  position: absolute;
+  inset: -14% 0;
+  z-index: 0;
   background:
-    /* Readability overlay + gold ember at the base */
-    linear-gradient(180deg,
-      rgba(10, 10, 11, 0.68) 0%,
-      rgba(10, 10, 11, 0.42) 45%,
-      rgba(10, 10, 11, 0.88) 100%),
-    radial-gradient(120% 55% at 50% 108%,
-      rgba(253, 185, 21, 0.22) 0%,
+    linear-gradient(100deg,
+      rgba(10, 10, 11, 0.9) 25%,
+      rgba(10, 10, 11, 0.55) 65%,
+      rgba(10, 10, 11, 0.72) 100%),
+    radial-gradient(110% 50% at 78% 100%,
+      rgba(253, 185, 21, 0.2) 0%,
       rgba(253, 185, 21, 0) 60%),
-    url("../assets/img/pattern-hero.jpg") center / cover no-repeat,
-    var(--black);
+    url("../assets/img/pattern-hero.jpg") center / cover no-repeat;
+  will-change: transform;
 }
 
 .hero__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: grid;
+  align-content: center;
+  gap: var(--s-5);
+  padding-block: calc(var(--header-h) + 4.5rem) var(--s-6);
+}
+@media (min-width: 1024px) {
+  .hero__inner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+    gap: var(--s-6);
+  }
 }
 
-/* One-time entrance, staggered 60ms per element. Page load is rare,
-   so it can afford delight — but stays fast (last element settles ~600ms). */
-.hero__logo,
+/* One-time entrance, staggered 70ms per element. Page load is rare,
+   so it can afford delight — but stays fast (last element settles ~700ms). */
 .hero__eyebrow,
-.hero__title,
+.hero__title .hero__line,
 .hero__tagline,
-.hero__actions {
-  animation: reveal-in 550ms var(--ease-out) both;
+.hero__actions,
+.hero-card {
+  animation: reveal-in 600ms var(--ease-out) both;
 }
-.hero__eyebrow  { animation-delay: 60ms; }
-.hero__title    { animation-delay: 120ms; }
-.hero__tagline  { animation-delay: 180ms; }
-.hero__actions  { animation-delay: 240ms; }
-
-.hero__logo {
-  width: clamp(230px, 55vw, 430px);
-  margin-bottom: var(--s-4);
-  filter: drop-shadow(0 18px 44px rgba(0, 0, 0, 0.55));
-}
+.hero__title .hero__line:nth-child(1) { animation-delay: 70ms; }
+.hero__title .hero__line:nth-child(2) { animation-delay: 140ms; }
+.hero__tagline  { animation-delay: 210ms; }
+.hero__actions  { animation-delay: 280ms; }
+.hero-card      { animation-delay: 350ms; }
 
 .hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   font-weight: 700;
   font-size: 0.8125rem;
-  letter-spacing: 0.42em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--gold);
-  margin-bottom: var(--s-2);
+  margin-bottom: var(--s-3);
 }
 
 .hero__title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(3rem, 11vw, 6rem);
-  line-height: 0.98;
-  letter-spacing: 0.01em;
+  font-size: clamp(3.25rem, 13.5vw, 8.25rem);
+  line-height: 0.94;
+  letter-spacing: 0.005em;
   text-transform: uppercase;
 }
-.hero__title span {
+.hero__line {
+  display: block;
+}
+/* Outlined first line — print-poster contrast against the solid second line */
+.hero__line--outline {
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(244, 241, 233, 0.9);
+}
+@supports not (-webkit-text-stroke: 2px #fff) {
+  .hero__line--outline { color: var(--text); }
+}
+.hero__title .gold {
+  font-style: normal;
   color: var(--gold);
+}
+.hero__title .amp {
+  font-style: normal;
+  color: var(--text-faint);
 }
 
 .hero__tagline {
-  margin-top: var(--s-2);
+  margin-top: var(--s-3);
   color: var(--text-muted);
   font-size: clamp(0.9375rem, 2.5vw, 1.125rem);
+  max-width: 44ch;
 }
 
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: var(--s-2);
   margin-top: var(--s-4);
 }
 
-/* Next-match chip — filled by JS once fixtures load */
-.hero__next {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem 0.75rem;
-  margin-top: var(--s-4);
-  padding: 0.625rem 1.25rem;
-  border: 1px solid var(--line-gold);
-  background: rgba(10, 10, 11, 0.55);
-  color: var(--text);
-  font-size: 0.875rem;
-  clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px);
-  opacity: 1;
-  transform: translateY(0);
-  transition: border-color var(--t-fast) ease,
-              background-color var(--t-fast) ease,
-              opacity 300ms var(--ease-out),
-              transform 300ms var(--ease-out);
-}
-/* Chip is un-hidden by JS once fixtures load — fade it up from rest,
-   never from nothing (no scale(0) entrances anywhere). */
-@starting-style {
-  .hero__next {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-}
-@media (hover: hover) and (pointer: fine) {
-  .hero__next:hover {
-    border-color: var(--gold);
-    background: rgba(23, 23, 29, 0.85);
-  }
-}
-.hero__next:active {
-  transform: scale(0.98);
-}
-.hero__next-label {
-  font-weight: 700;
-  font-size: 0.6875rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-
-/* Scroll cue — a falling gold line */
-.hero__scroll {
-  position: absolute;
-  left: 50%;
-  bottom: 1.25rem;
-  width: 2px;
-  height: 3rem;
-  transform: translateX(-50%);
-  background: linear-gradient(var(--gold), transparent);
-  animation: scroll-cue 2.2s var(--ease) infinite;
-}
-@keyframes scroll-cue {
-  0%   { transform: translateX(-50%) scaleY(0); transform-origin: top; }
-  45%  { transform: translateX(-50%) scaleY(1); transform-origin: top; }
-  55%  { transform: translateX(-50%) scaleY(1); transform-origin: bottom; }
-  100% { transform: translateX(-50%) scaleY(0); transform-origin: bottom; }
-}
-
-/* --------------------------------------------------------------------------
-   7. FIXTURES
-   -------------------------------------------------------------------------- */
-.section--matches {
-  position: relative;
-  background:
-    linear-gradient(180deg, rgba(10, 10, 11, 0.96), rgba(10, 10, 11, 0.9)),
-    url("../assets/img/pattern-dark.jpg") center / cover fixed no-repeat;
-}
-@media (max-width: 767px) {
-  /* background-attachment: fixed janks on mobile — switch to scroll */
-  .section--matches { background-attachment: scroll, scroll; }
-}
-
-.matches-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--s-3);
-  /* Reserve space so cards arriving after fetch don't shift the page (CLS) */
-  min-height: 280px;
-}
-@media (min-width: 768px) {
-  .matches-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (min-width: 1024px) {
-  .matches-grid { grid-template-columns: repeat(3, 1fr); }
-}
-
-/* ---- Match card ---- */
-.match-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-3);
+/* ---- Next-match card (docked right on desktop) ---- */
+.hero-card {
+  justify-self: start;
+  width: min(100%, 400px);
   padding: var(--s-3);
-  background: linear-gradient(160deg, var(--ink-800), var(--ink-900));
+  background: rgba(16, 16, 20, 0.82);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--line);
-  /* Hairline top highlight — reads as light hitting the card edge */
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   clip-path: polygon(
     0 0,
@@ -585,21 +730,404 @@ button {
     var(--notch) 100%,
     0 calc(100% - var(--notch))
   );
-  transition: transform var(--t-fast) var(--ease-out),
-              border-color var(--t-fast) ease;
+}
+@media (min-width: 1024px) {
+  .hero-card { justify-self: end; }
+}
+.hero-card__label {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  margin-bottom: var(--s-2);
+  background: var(--gold);
+  color: var(--black);
+  font-weight: 700;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  clip-path: polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px);
+}
+.hero-card__label--today {
+  animation: badge-pulse 2s ease infinite;
+}
+.hero-card__comp {
+  font-weight: 700;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: var(--s-2);
+}
+.hero-card__teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--s-2);
+  padding-block: var(--s-2);
+}
+.hero-card__meta {
+  display: grid;
+  gap: 0.375rem;
+  padding-top: var(--s-2);
+  border-top: 1px solid var(--line);
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+.hero-card__meta strong {
+  color: var(--text);
+}
+.hero-card__link {
+  display: inline-block;
+  margin-top: var(--s-2);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
 }
 @media (hover: hover) and (pointer: fine) {
-  .match-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--line-gold);
+  .hero-card__link:hover { color: var(--gold-bright); }
+}
+
+/* Compact team treatment inside the hero card */
+.hero-card .match-team__logo { height: 3rem; }
+.hero-card .match-team__initials {
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.125rem;
+}
+.hero-card .match-team__name { font-size: 0.875rem; }
+.hero-card .match-ko {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   8. MARQUEE — shared ticker mechanics
+   -------------------------------------------------------------------------- */
+.marquee {
+  overflow: hidden;
+}
+/* Spacing comes from per-item margins, not flex gap: the track is two
+   identical halves, and only uniform per-item spacing keeps the -50%
+   loop point invisible. */
+.marquee__track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: marquee-roll var(--marquee-speed, 30s) linear infinite;
+}
+.marquee__track > * {
+  margin-right: var(--s-4);
+}
+/* Hold the rail still while the visitor reads it */
+.marquee:hover .marquee__track,
+.marquee:focus-within .marquee__track {
+  animation-play-state: paused;
+}
+@keyframes marquee-roll {
+  to { transform: translateX(-50%); }
+}
+
+/* Gold diamond separator */
+.marquee i {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  background: var(--gold);
+  transform: rotate(45deg);
+}
+
+/* Hero ticker flavour */
+.hero__marquee {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--line);
+  background: rgba(10, 10, 11, 0.65);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  --marquee-speed: 32s;
+}
+.hero__marquee span {
+  padding-block: 0.875rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   9. FIXTURES — the gold field
+   -------------------------------------------------------------------------- */
+.section--matches {
+  background:
+    linear-gradient(180deg, rgba(253, 185, 21, 0.94), rgba(253, 185, 21, 0.9)),
+    url("../assets/img/jersey-gold.jpg") center / cover no-repeat;
+  color: var(--on-gold);
+}
+.section--matches .section-head__eyebrow { color: var(--on-gold); }
+.section--matches .section-head__sub { color: var(--on-gold-muted); }
+.section--matches :focus-visible {
+  outline-color: var(--black);
+}
+.section--matches ::selection {
+  background: var(--black);
+  color: var(--gold);
+}
+
+/* Rail arrows — sit beside the title, Toulouse-style */
+.rail-controls {
+  display: flex;
+  gap: var(--s-1);
+  padding-bottom: 0.5rem;
+}
+.rail-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: var(--black);
+  border: 1px solid var(--black);
+  color: var(--gold);
+  cursor: pointer;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition: transform var(--t-press) var(--ease-out),
+              opacity var(--t-fast) ease,
+              background-color var(--t-fast) ease,
+              color var(--t-fast) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .rail-btn:hover {
+    background: var(--ink-800);
+  }
+}
+.rail-btn:active {
+  transform: scale(0.94);
+}
+.rail-btn[disabled] {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ---- Featured match: the next fixture, full-width panel ---- */
+.match-featured {
+  /* Reserve space so the panel arriving after fetch doesn't shift the page */
+  min-height: 280px;
+  margin-bottom: var(--s-4);
+}
+.featured-card {
+  position: relative;
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--s-3);
+  background:
+    linear-gradient(120deg, rgba(23, 23, 29, 0.55), rgba(10, 10, 11, 0) 55%),
+    linear-gradient(160deg, var(--ink-800), var(--black));
+  color: var(--text);
+  box-shadow: 0 24px 60px -30px rgba(10, 10, 11, 0.55);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--notch)) 0,
+    100% var(--notch),
+    100% 100%,
+    var(--notch) 100%,
+    0 calc(100% - var(--notch))
+  );
+}
+@media (min-width: 768px) {
+  .featured-card {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    padding: var(--s-5) var(--s-4);
   }
 }
 
-.match-card__top {
+.featured-card__badge {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.3125rem 0.875rem;
+  margin-bottom: var(--s-2);
+  background: var(--gold);
+  color: var(--black);
+  font-weight: 700;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  clip-path: polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px);
+}
+.featured-card--today .featured-card__badge {
+  animation: badge-pulse 2s ease infinite;
+}
+@keyframes badge-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(253, 185, 21, 0.45); }
+  50%      { box-shadow: 0 0 0 8px rgba(253, 185, 21, 0); }
+}
+
+.featured-card__comp {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.featured-card__date {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  margin-block: 0.375rem var(--s-2);
+}
+.featured-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem var(--s-3);
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+.featured-card__meta svg {
+  flex-shrink: 0;
+  color: var(--gold);
+}
+.featured-card__meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.featured-card__teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--s-2);
+}
+@media (min-width: 768px) {
+  .featured-card__teams { gap: var(--s-4); }
+}
+
+.match-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.match-team__logo {
+  height: 4rem;
+  width: auto;
+  object-fit: contain;
+}
+.featured-card .match-team__logo { height: 5rem; }
+@media (min-width: 768px) {
+  .featured-card .match-team__logo { height: 6.5rem; }
+}
+/* Text fallback when an opponent has no logo file */
+.match-team__initials {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--s-1);
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--gold);
+  border: 1px solid var(--line-gold);
+  background: rgba(253, 185, 21, 0.08);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.featured-card .match-team__initials {
+  width: 5rem;
+  height: 5rem;
+  font-size: 1.75rem;
+}
+@media (min-width: 768px) {
+  .featured-card .match-team__initials {
+    width: 6.5rem;
+    height: 6.5rem;
+    font-size: 2.25rem;
+  }
+}
+.match-team__name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.featured-card .match-team__name {
+  font-size: clamp(1.125rem, 2.5vw, 1.625rem);
+}
+
+/* Kick-off chip between the crests */
+.match-ko {
+  justify-self: center;
+  padding: 0.4375rem 0.875rem;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--line-gold);
+  color: var(--gold);
+  white-space: nowrap;
+  clip-path: polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px);
+}
+
+/* ---- Fixture rail ---- */
+.rail {
+  /* Bleed to the viewport edge on the right — the cut-off card says "scroll me" */
+  margin-inline: calc(var(--gutter) * -1);
+  padding-inline: var(--gutter);
+  overflow: hidden;
+}
+.rail__track {
+  display: flex;
+  gap: var(--s-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--s-2);
+  scrollbar-width: none;
+  cursor: grab;
+}
+.rail__track::-webkit-scrollbar { display: none; }
+.rail__track.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+.rail__track > li {
+  flex: 0 0 min(78vw, 300px);
+  scroll-snap-align: start;
+  display: flex;
+}
+
+/* ---- Rail match card: black on gold ---- */
+.match-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  width: 100%;
+  padding: var(--s-3);
+  background: linear-gradient(160deg, var(--ink-800), var(--black));
+  color: var(--text);
+  box-shadow: 0 16px 40px -24px rgba(10, 10, 11, 0.5);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--notch)) 0,
+    100% var(--notch),
+    100% 100%,
+    var(--notch) 100%,
+    0 calc(100% - var(--notch))
+  );
+  transition: transform var(--t-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .match-card:hover {
+    transform: translateY(-4px);
+  }
 }
 
 .match-card__comp {
@@ -609,157 +1137,58 @@ button {
   text-transform: uppercase;
   color: var(--text-faint);
 }
-
-.badge {
-  flex-shrink: 0;
-  font-weight: 700;
-  font-size: 0.6875rem;
-  letter-spacing: 0.16em;
+.match-card__date {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  padding: 0.3125rem 0.75rem;
-  clip-path: polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px);
 }
-.badge--upcoming {
-  color: var(--gold);
-  border: 1px solid var(--line-gold);
-}
-.badge--today {
-  color: var(--black);
-  background: var(--gold);
-  animation: badge-pulse 2s var(--ease) infinite;
-}
-@keyframes badge-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(253, 185, 21, 0.45); }
-  50%      { box-shadow: 0 0 0 8px rgba(253, 185, 21, 0); }
-}
-
-/* Teams row: Falcons vs Opponent */
 .match-card__teams {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--s-1);
+  padding-block: var(--s-2);
+  border-block: 1px solid var(--line);
 }
-.match-team {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.625rem;
-  min-width: 0;
-}
-.match-team__logo {
-  height: 3.5rem;
-  width: auto;
-  object-fit: contain;
-}
-/* Text fallback when an opponent has no logo file */
-.match-team__initials {
+.match-card__venue {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  font-family: var(--font-display);
-  font-size: 1.375rem;
-  color: var(--gold);
-  border: 1px solid var(--line-gold);
-  background: rgba(253, 185, 21, 0.08);
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-}
-.match-team__name {
-  font-family: var(--font-display);
-  font-size: 0.9375rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  text-align: center;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-.match-card__vs {
-  font-family: var(--font-display);
-  font-size: 1.125rem;
-  color: var(--text-faint);
-}
-
-/* Date / time / venue */
-.match-card__meta {
-  margin-top: auto;
-  padding-top: var(--s-2);
-  border-top: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
   gap: 0.5rem;
-  font-size: 0.9375rem;
+  margin-top: auto;
+  font-size: 0.875rem;
   color: var(--text-muted);
 }
-.match-card__meta svg {
+.match-card__venue svg {
   flex-shrink: 0;
   color: var(--gold);
 }
-.match-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  min-width: 0;
-}
-.match-meta-row strong {
-  color: var(--text);
-  font-weight: 700;
-}
-
-/* ---- Today's match: hero treatment, spans the full grid row ---- */
-.match-card--today {
-  grid-column: 1 / -1;
-  border-color: var(--gold);
-  background:
-    linear-gradient(120deg, rgba(23, 23, 29, 0.92) 40%, rgba(253, 185, 21, 0.12)),
-    linear-gradient(160deg, var(--ink-800), var(--ink-900));
-  box-shadow: var(--glow-gold);
-}
-@media (min-width: 768px) {
-  .match-card--today {
-    padding: var(--s-4);
-  }
-  .match-card--today .match-card__teams {
-    gap: var(--s-4);
-  }
-  .match-card--today .match-team__logo,
-  .match-card--today .match-team__initials {
-    height: 5.5rem;
-    width: auto;
-  }
-  .match-card--today .match-team__initials { width: 5.5rem; }
-  .match-card--today .match-team__name { font-size: 1.375rem; }
-  .match-card--today .match-card__vs { font-size: 1.75rem; color: var(--gold); }
-  .match-card--today .match-card__meta {
-    flex-direction: row;
-    justify-content: center;
-    gap: var(--s-4);
-  }
-}
 
 .matches-note {
-  margin-top: var(--s-3);
-  text-align: center;
-  color: var(--text-faint);
+  margin-top: var(--s-2);
   font-size: 0.875rem;
+  color: var(--on-gold-muted);
 }
 
 /* Empty state (no upcoming fixtures) */
 .matches-empty {
-  grid-column: 1 / -1;
-  text-align: center;
   padding: var(--s-6) var(--s-3);
-  border: 1px dashed var(--line);
+  text-align: center;
+  background: var(--black);
   color: var(--text-muted);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--notch)) 0,
+    100% var(--notch),
+    100% 100%,
+    var(--notch) 100%,
+    0 calc(100% - var(--notch))
+  );
 }
 .matches-empty strong {
   display: block;
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text);
@@ -767,29 +1196,64 @@ button {
 }
 
 /* --------------------------------------------------------------------------
-   8. SPONSORS
+   10. STATS — the club in numbers
    -------------------------------------------------------------------------- */
-.section--sponsors {
-  border-top: 1px solid var(--line);
+.stats {
+  padding-block: var(--s-6);
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(10, 10, 11, 0.95), rgba(10, 10, 11, 0.92)),
+    url("../assets/img/pattern-dark.jpg") center / cover no-repeat;
+}
+.stats__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s-4) var(--s-3);
+}
+@media (min-width: 768px) {
+  .stats__grid { grid-template-columns: repeat(4, 1fr); }
+}
+.stat {
+  padding-left: var(--s-2);
+  border-left: 2px solid var(--gold);
+}
+.stat__num {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 7vw, 4.5rem);
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.stat__num em {
+  font-style: normal;
+  color: var(--gold);
+}
+.stat__label {
+  display: block;
+  margin-top: 0.5rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
-/* Main sponsor spotlight */
+/* --------------------------------------------------------------------------
+   11. SPONSORS
+   -------------------------------------------------------------------------- */
 .sponsor-spotlight {
-  margin-bottom: var(--s-4);
+  margin-bottom: var(--s-6);
 }
 .spotlight-card {
   position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--s-1);
-  text-align: center;
-  padding: var(--s-5) var(--s-3);
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-3);
   background:
-    linear-gradient(180deg, rgba(16, 16, 20, 0.92), rgba(16, 16, 20, 0.97)),
-    url("../assets/img/pattern-dark.jpg") center / cover no-repeat;
-  border: 1px solid var(--line-gold);
+    linear-gradient(120deg, rgba(16, 16, 20, 0.94), rgba(16, 16, 20, 0.86)),
+    url("../assets/img/banner-split.jpg") center / cover no-repeat;
+  border: 1px solid var(--line);
   clip-path: polygon(
     0 0,
     calc(100% - var(--notch)) 0,
@@ -805,7 +1269,32 @@ button {
   position: absolute;
   inset: 0 0 auto 0;
   height: 3px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  background: linear-gradient(90deg, var(--gold), rgba(253, 185, 21, 0.1));
+}
+@media (min-width: 768px) {
+  .spotlight-card {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: var(--s-5);
+    padding: var(--s-5) var(--s-4);
+  }
+}
+.spotlight-card__mono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 6rem;
+  height: 6rem;
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  color: var(--gold);
+  background: rgba(253, 185, 21, 0.08);
+  border: 1px solid var(--line-gold);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+.spotlight-card img {
+  max-height: 6rem;
+  width: auto;
 }
 .spotlight-card__label {
   font-weight: 700;
@@ -813,203 +1302,97 @@ button {
   letter-spacing: 0.35em;
   text-transform: uppercase;
   color: var(--gold);
+  margin-bottom: 0.375rem;
 }
 .spotlight-card__name {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 6vw, 3.25rem);
+  font-size: clamp(2.25rem, 6vw, 4rem);
   line-height: 1;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--text);
 }
 .spotlight-card__tag {
+  margin-top: 0.5rem;
   color: var(--text-muted);
   font-size: 0.9375rem;
 }
-.spotlight-card img {
-  max-height: 5.5rem;
-  width: auto;
-}
 
-/* Carousel */
-.carousel__viewport {
-  overflow: hidden;
-  /* Soft edges hint that the row continues beyond the frame */
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
-  /* Horizontal drag is ours; vertical stays with the page scroll */
-  touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
-  cursor: grab;
+/* Partner marquee — full-bleed, always rolling */
+.marquee--sponsors {
+  border-block: 1px solid var(--line);
+  --marquee-speed: 38s;
 }
-.carousel__viewport.is-dragging {
-  cursor: grabbing;
+.marquee--sponsors .marquee__track {
+  padding-block: var(--s-4);
 }
-.carousel__track.no-transition {
-  transition: none;
+.marquee--sponsors .marquee__track > * {
+  margin-right: 0; /* the item's own padding carries the rhythm */
 }
-.carousel__track {
-  display: flex;
-  /* translateX set by JS. A transition (not keyframes) so rapid prev/next
-     clicks retarget smoothly instead of restarting from zero. */
-  transition: transform var(--t-move) var(--ease-in-out);
-  margin-inline: calc(var(--s-1) * -1);
-}
-.carousel__slide {
-  /* --per-view is set by JS: 2 (mobile) / 3 (tablet) / 4 (desktop) */
-  flex: 0 0 calc(100% / var(--per-view, 2));
-  padding-inline: var(--s-1);
-}
-
-.sponsor-card {
-  height: 100%;
+.sponsor-item {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  text-align: center;
-  padding: var(--s-3) var(--s-2);
-  background: linear-gradient(160deg, var(--ink-800), var(--ink-900));
-  border: 1px solid var(--line);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  clip-path: polygon(
-    0 0,
-    calc(100% - 12px) 0,
-    100% 12px,
-    100% 100%,
-    12px 100%,
-    0 calc(100% - 12px)
-  );
-  transition: transform var(--t-fast) var(--ease-out),
-              border-color var(--t-fast) ease;
+  gap: 0.25rem;
+  padding-right: calc(var(--s-5) * 2);
+  white-space: nowrap;
 }
-@media (hover: hover) and (pointer: fine) {
-  .sponsor-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--line-gold);
-  }
+/* Gold diamond separator, centred in the item's trailing space */
+.sponsor-item::after {
+  content: "";
+  position: absolute;
+  right: calc(var(--s-5) - 4px);
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  background: var(--gold);
+  transform: translateY(-50%) rotate(45deg);
 }
-a.sponsor-card:active {
-  transform: scale(0.98);
-}
-.sponsor-card__mono {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.25rem;
-  height: 3.25rem;
+.sponsor-item__name {
   font-family: var(--font-display);
-  font-size: 1.25rem;
-  color: var(--gold);
-  background: rgba(253, 185, 21, 0.08);
-  border: 1px solid var(--line-gold);
-  clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
-}
-.sponsor-card__logo {
-  max-height: 3.25rem;
-  width: auto;
-  object-fit: contain;
-}
-.sponsor-card__name {
-  font-weight: 700;
-  font-size: 0.9375rem;
-  letter-spacing: 0.04em;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   color: var(--text);
-}
-.sponsor-card__tag {
-  font-size: 0.75rem;
-  color: var(--text-faint);
-  min-height: 1.2em;
-}
-
-.carousel__controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--s-2);
-  margin-top: var(--s-3);
-}
-.carousel__btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--text);
-  cursor: pointer;
-  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  transition: transform var(--t-press) var(--ease-out),
-              border-color var(--t-fast) ease,
-              color var(--t-fast) ease,
-              background-color var(--t-fast) ease;
+  transition: color var(--t-fast) ease;
 }
 @media (hover: hover) and (pointer: fine) {
-  .carousel__btn:hover {
-    border-color: var(--gold);
+  .sponsor-item:hover .sponsor-item__name {
     color: var(--gold);
   }
 }
-.carousel__btn:active {
-  transform: scale(0.94);
-  background: rgba(253, 185, 21, 0.12);
+.sponsor-item__tag {
+  font-weight: 700;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  min-height: 1em;
 }
-.carousel__status {
-  min-width: 5.5rem;
-  text-align: center;
-  font-size: 0.8125rem;
-  letter-spacing: 0.1em;
+a.sponsor-item { color: inherit; }
+
+.sponsors-hint {
+  margin-top: var(--s-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--text-faint);
 }
 
 /* --------------------------------------------------------------------------
-   9. BANNER — diagonal gold/black brand pattern
-   -------------------------------------------------------------------------- */
-.banner {
-  position: relative;
-  padding-block: var(--s-6);
-  background:
-    linear-gradient(100deg, rgba(10, 10, 11, 0.88) 30%, rgba(10, 10, 11, 0.55)),
-    url("../assets/img/banner-split.jpg") center / cover no-repeat;
-  border-block: 1px solid var(--line);
-}
-.banner__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--s-2);
-}
-.banner__kicker {
-  font-weight: 700;
-  font-size: 0.8125rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-.banner__line {
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 5vw, 2.75rem);
-  line-height: 1.1;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  max-width: 18ch;
-}
-
-/* --------------------------------------------------------------------------
-   10. THE CLUB
+   12. THE CLUB
    -------------------------------------------------------------------------- */
 .club-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--s-5);
+  gap: var(--s-6);
 }
 @media (min-width: 1024px) {
   .club-grid {
-    grid-template-columns: 7fr 5fr;
-    gap: var(--s-6);
+    grid-template-columns: 6fr 5fr;
+    gap: var(--s-7);
     align-items: start;
   }
 }
@@ -1017,20 +1400,25 @@ a.sponsor-card:active {
 .club-about p {
   color: var(--text-muted);
   margin-bottom: var(--s-2);
-  max-width: 60ch;
+  max-width: 58ch;
+}
+.club-about p:first-child {
+  font-size: 1.125rem;
+  color: var(--text);
 }
 
+/* Facts — hairline ledger rows, not boxes */
 .club-facts {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
   margin-block: var(--s-4);
-  background: var(--line);
-  border: 1px solid var(--line);
+  border-top: 1px solid var(--line);
 }
 .club-fact {
-  background: var(--ink-900);
-  padding: var(--s-2);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2);
+  padding-block: var(--s-2);
+  border-bottom: 1px solid var(--line);
 }
 .club-fact dt {
   font-weight: 700;
@@ -1038,13 +1426,13 @@ a.sponsor-card:active {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--gold);
-  margin-bottom: 0.25rem;
 }
 .club-fact dd {
   font-family: var(--font-display);
-  font-size: 1.0625rem;
+  font-size: 1.125rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
+  text-align: right;
 }
 
 .club-social {
@@ -1082,7 +1470,7 @@ a.sponsor-card:active {
 }
 
 .club-photo {
-  border: 1px solid var(--line);
+  overflow: hidden;
   background: var(--ink-900);
   clip-path: polygon(
     0 0,
@@ -1093,16 +1481,13 @@ a.sponsor-card:active {
     0 calc(100% - var(--notch))
   );
 }
-.club-photo {
-  overflow: hidden;
-}
 .club-photo img {
   width: 100%;
   transition: transform 600ms var(--ease-in-out);
 }
 @media (hover: hover) and (pointer: fine) {
   .club-photo:hover img {
-    transform: scale(1.02);
+    transform: scale(1.03);
   }
 }
 .club-photo figcaption {
@@ -1111,38 +1496,95 @@ a.sponsor-card:active {
   color: var(--text-faint);
 }
 
-.honours {
-  display: grid;
-  gap: var(--s-2);
-  margin-top: var(--s-3);
-}
-.honour-card {
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  padding: var(--s-2) var(--s-3);
-  background: linear-gradient(160deg, var(--ink-800), var(--ink-900));
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--gold);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-.honour-card svg {
-  flex-shrink: 0;
+.club-side__label {
+  margin-block: var(--s-4) var(--s-2);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
   color: var(--gold);
 }
-.honour-card__title {
+
+/* Honours — a numbered index, editorial style */
+.honours {
+  counter-reset: honour;
+  border-top: 1px solid var(--line);
+}
+.honour-row {
+  counter-increment: honour;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  padding-block: var(--s-2);
+  border-bottom: 1px solid var(--line);
+  transition: background-color var(--t-fast) ease,
+              transform var(--t-fast) var(--ease-out);
+}
+.honour-row::before {
+  content: counter(honour, decimal-leading-zero);
+  flex-shrink: 0;
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 1.125rem;
+  color: var(--gold);
+}
+@media (hover: hover) and (pointer: fine) {
+  .honour-row:hover {
+    transform: translateX(6px);
+  }
+}
+.honour-row__title {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-.honour-card__detail {
+.honour-row__detail {
   font-size: 0.875rem;
   color: var(--text-muted);
 }
 
 /* --------------------------------------------------------------------------
-   11. FOOTER
+   13. BANNER — matchday call-out over the split-pattern photo
+   -------------------------------------------------------------------------- */
+.banner {
+  position: relative;
+  overflow: hidden;
+  padding-block: var(--s-7);
+}
+.banner__bg {
+  position: absolute;
+  inset: -18% 0;
+  background:
+    linear-gradient(100deg, rgba(10, 10, 11, 0.9) 30%, rgba(10, 10, 11, 0.5)),
+    url("../assets/img/banner-split.jpg") center / cover no-repeat;
+  will-change: transform;
+}
+.banner__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-2);
+}
+.banner__kicker {
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.banner__line {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  max-width: 18ch;
+}
+.banner .btn { margin-top: var(--s-2); }
+
+/* --------------------------------------------------------------------------
+   14. FOOTER
    -------------------------------------------------------------------------- */
 .site-footer {
   position: relative;
@@ -1152,19 +1594,40 @@ a.sponsor-card:active {
   border-top: 1px solid var(--line);
 }
 
+/* The send-off */
+.footer-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-block: var(--s-7) var(--s-5);
+  border-bottom: 1px solid var(--line);
+}
+.footer-hero__line {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 12vw, 7.5rem);
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.footer-hero__line span {
+  color: var(--gold);
+}
+.footer-hero__mark {
+  width: clamp(72px, 12vw, 120px);
+  margin-bottom: 0.5rem;
+}
+
 .footer-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--s-4);
-  padding-block: var(--s-6);
+  padding-block: var(--s-5);
 }
 @media (min-width: 768px) {
   .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; }
 }
 
-.footer-brand img {
-  margin-bottom: var(--s-2);
-}
 .footer-brand__name {
   font-family: var(--font-display);
   font-size: 1.375rem;
@@ -1230,7 +1693,7 @@ a.sponsor-card:active {
 }
 
 /* --------------------------------------------------------------------------
-   12. MOTION & ACCESSIBILITY
+   15. MOTION & ACCESSIBILITY
    Reduced motion means fewer and gentler animations, not zero: gentle
    opacity fades stay (they aid comprehension), movement goes.
    -------------------------------------------------------------------------- */
@@ -1241,39 +1704,60 @@ a.sponsor-card:active {
 
   /* Reveals and hero entrance become plain fades — no translation */
   .reveal.is-visible,
-  .hero__logo,
+  .reveal--clip.is-visible,
   .hero__eyebrow,
-  .hero__title,
+  .hero__title .hero__line,
   .hero__tagline,
-  .hero__actions {
+  .hero__actions,
+  .hero-card {
     animation: reveal-fade 200ms ease both;
     animation-delay: 0ms;
   }
 
-  /* No movement: lifts, presses, slides, pulses, photo zoom, scroll cue */
+  /* Display titles: no slide, just appear */
+  .t-line > span {
+    transform: none;
+    transition: none;
+  }
+
+  /* Marquees stop rolling and wrap into a static row instead */
+  .marquee__track {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .hero__marquee,
+  .sponsors-hint {
+    display: none;
+  }
+
+  /* No movement: lifts, presses, slides, pulses, photo zoom */
   .btn,
   .btn:hover,
   .btn:active,
   .match-card:hover,
-  .sponsor-card:hover,
-  a.sponsor-card:active,
-  .carousel__btn:active,
+  .honour-row:hover,
+  .rail-btn:active,
+  .nav-burger:active,
   .social-link:hover,
   .social-link:active,
-  .hero__next,
   .club-photo img,
   .club-photo:hover img {
     transform: none;
     transition-property: background-color, color, border-color, opacity;
   }
-  .carousel__track {
-    transition-duration: 0.01ms;
+  .menu-overlay li,
+  .menu-overlay__foot {
+    transform: none;
+    transition-delay: 0ms;
   }
-  .badge--today {
+  .featured-card__badge,
+  .hero-card__label--today {
     animation: none;
   }
-  .hero__scroll {
-    display: none;
+  .rail__track {
+    scroll-behavior: auto;
   }
 }
 
