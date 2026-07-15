@@ -219,6 +219,7 @@
       '<p class="hero-card__comp">' + esc(m.competition) +
         (m.round ? " • " + esc(m.round) : "") + "</p>" +
       '<div class="hero-card__teams">' + teamsBlockHTML(m) + "</div>" +
+      '<div class="hero-card__count" id="hero-count" hidden></div>' +
       '<div class="hero-card__meta">' +
         "<span><strong>" + esc(formatDate(m.date)) + "</strong></span>" +
         "<span>" + esc(m.venue || "Venue TBC") + "</span>" +
@@ -226,6 +227,72 @@
       '<a class="hero-card__link" href="#matches">Full fixture list &rarr;</a>';
     attachLogoFallbacks(card);
     card.hidden = false;
+    initCountdown(m);
+  }
+
+  /**
+   * Live countdown in the hero card. Counts to kick-off when the time is
+   * known, otherwise to midnight of matchday. On matchday itself it
+   * switches to a static "It's matchday" line.
+   */
+  function initCountdown(m) {
+    var host = document.getElementById("hero-count");
+    if (!host || !m.date) { return; }
+
+    // Matchday: no ticking needed (and under a ?date= preview the real
+    // clock would disagree with the simulated day — never show both).
+    var dateOverridden = new URLSearchParams(window.location.search).get("date");
+    if (m.status === "today" && (!m.time || dateOverridden)) {
+      host.innerHTML = '<span class="hero-card__count-label">It&rsquo;s matchday — up the Falcons</span>';
+      host.hidden = false;
+      return;
+    }
+
+    var p = m.date.split("-").map(Number);
+    var target;
+    var label = "to matchday";
+    if (m.time && /^\d{1,2}:\d{2}$/.test(m.time)) {
+      var t = m.time.split(":").map(Number);
+      target = new Date(p[0], p[1] - 1, p[2], t[0], t[1]);
+      label = "to kick-off";
+    } else {
+      target = new Date(p[0], p[1] - 1, p[2]);
+    }
+
+    function segment(value, unit) {
+      return '<span class="hero-card__count-num">' +
+        String(value).padStart(2, "0") + "<i>" + unit + "</i></span>";
+    }
+
+    var timer = null;
+    function render() {
+      var diff = target.getTime() - Date.now();
+      if (diff <= 0) {
+        host.innerHTML = '<span class="hero-card__count-label">It&rsquo;s matchday — up the Falcons</span>';
+        if (timer) { window.clearInterval(timer); }
+        return;
+      }
+      var s = Math.floor(diff / 1000);
+      host.innerHTML =
+        segment(Math.floor(s / 86400), "d") +
+        segment(Math.floor(s % 86400 / 3600), "h") +
+        segment(Math.floor(s % 3600 / 60), "m") +
+        segment(s % 60, "s") +
+        '<span class="hero-card__count-label">' + label + "</span>";
+    }
+
+    render();
+    host.hidden = false;
+    timer = window.setInterval(render, 1000);
+    document.addEventListener("visibilitychange", function () {
+      // No point ticking a hidden tab
+      if (document.hidden) {
+        if (timer) { window.clearInterval(timer); timer = null; }
+      } else if (!timer) {
+        render();
+        timer = window.setInterval(render, 1000);
+      }
+    });
   }
 
   function renderMatches(data, today) {
@@ -315,6 +382,29 @@
     track.addEventListener("scroll", updateButtons, { passive: true });
     window.addEventListener("resize", updateButtons);
     updateButtons();
+
+    // Velocity skew: cards lean into the scroll and ease back upright
+    if (!REDUCED_MOTION) {
+      var lastLeft = track.scrollLeft, skew = 0, settling = null;
+      function settle() {
+        skew *= 0.85;
+        if (Math.abs(skew) < 0.05) {
+          skew = 0;
+          track.style.setProperty("--rail-skew", "0deg");
+          settling = null;
+          return;
+        }
+        track.style.setProperty("--rail-skew", skew.toFixed(2) + "deg");
+        settling = window.requestAnimationFrame(settle);
+      }
+      track.addEventListener("scroll", function () {
+        var delta = track.scrollLeft - lastLeft;
+        lastLeft = track.scrollLeft;
+        skew = Math.max(-4, Math.min(4, delta * 0.22));
+        track.style.setProperty("--rail-skew", skew.toFixed(2) + "deg");
+        if (!settling) { settling = window.requestAnimationFrame(settle); }
+      }, { passive: true });
+    }
 
     // Mouse drag (touch already scrolls natively)
     var startX = 0, startScroll = 0, dragging = false, moved = false;
@@ -500,6 +590,217 @@
   }
 
   /* ------------------------------------------------------------------------
+     6b. HERO FIELD — the living triangle canvas
+     A low-poly mesh of jersey triangles: facets ignite gold around the
+     pointer, glint softly on their own, and a floodlight band sweeps
+     through every few seconds so touch screens get the show too.
+     ------------------------------------------------------------------------ */
+
+  function initHeroField() {
+    var canvas = document.getElementById("hero-canvas");
+    var hero = document.querySelector(".hero");
+    if (!canvas || !hero || !canvas.getContext) { return; }
+    var ctx = canvas.getContext("2d");
+
+    var CELL = 92;               // triangle size — bigger = calmer, cheaper
+    var GOLD = [253, 185, 21];
+    var tris = [];
+    var width = 0, height = 0;
+    var pointer = { x: -9999, y: -9999 };
+    var sweep = { x: -1e4, active: false, last: 0 };
+    var running = false, rafId = null, lastGlint = 0;
+
+    // Deterministic pseudo-random so rebuilds don't reshuffle the field
+    function rand(seed) {
+      var v = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+      return v - Math.floor(v);
+    }
+
+    function build() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      tris = [];
+      var cols = Math.ceil(width / CELL) + 1;
+      var rows = Math.ceil(height / CELL) + 1;
+      var pts = [];
+      for (var r = 0; r <= rows; r++) {
+        pts.push([]);
+        for (var c = 0; c <= cols; c++) {
+          // Jittered grid — reads as hand-cut fabric, not graph paper
+          var jx = (rand(r * 91 + c) - 0.5) * CELL * 0.5;
+          var jy = (rand(c * 57 + r) - 0.5) * CELL * 0.5;
+          pts[r].push([c * CELL + jx - CELL / 2, r * CELL + jy - CELL / 2]);
+        }
+      }
+      for (r = 0; r < rows; r++) {
+        for (c = 0; c < cols; c++) {
+          var quad = [pts[r][c], pts[r][c + 1], pts[r + 1][c + 1], pts[r + 1][c]];
+          var flip = rand(r * 13 + c * 7) > 0.5;
+          [[quad[0], quad[1], flip ? quad[2] : quad[3]],
+           [flip ? quad[0] : quad[1], quad[2], quad[3]]].forEach(function (pt, k) {
+            tris.push({
+              p: pt,
+              cx: (pt[0][0] + pt[1][0] + pt[2][0]) / 3,
+              cy: (pt[0][1] + pt[1][1] + pt[2][1]) / 3,
+              shade: rand(r * 3.3 + c * 8.1 + k),
+              heat: 0,
+              glint: 0
+            });
+          });
+        }
+      }
+    }
+
+    function draw(now) {
+      ctx.clearRect(0, 0, width, height);
+
+      // Ambient: a fresh facet glints roughly twice a second
+      if (now - lastGlint > 450 && tris.length) {
+        tris[Math.floor(Math.random() * tris.length)].glint = 1;
+        lastGlint = now;
+      }
+      // Floodlight sweep every ~9s
+      if (!sweep.active && now - sweep.last > 9000) {
+        sweep.active = true;
+        sweep.x = -width * 0.15;
+      }
+      if (sweep.active) {
+        sweep.x += width / 95;   // crosses in ~1.6s at 60fps
+        if (sweep.x > width * 1.15) {
+          sweep.active = false;
+          sweep.last = now;
+        }
+      }
+
+      var anyHot = false;
+      for (var i = 0; i < tris.length; i++) {
+        var t = tris[i];
+
+        var dx = t.cx - pointer.x, dy = t.cy - pointer.y;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 180) {
+          t.heat = Math.max(t.heat, (1 - d / 180) * 0.9);
+        }
+        var sw = 0;
+        if (sweep.active) {
+          var sd = Math.abs(t.cx - sweep.x);
+          if (sd < 110) { sw = (1 - sd / 110) * 0.32; }
+        }
+
+        t.heat *= 0.945;
+        t.glint *= 0.982;
+        var h = Math.min(1, t.heat + t.glint * 0.45 + sw);
+        if (h > 0.012) { anyHot = true; } else { h = 0; }
+
+        // Base facet: near-black inks with a whisper of variation
+        var base = 14 + t.shade * 9;
+        var rr = base + (GOLD[0] - base) * h * 0.9;
+        var gg = base + (GOLD[1] - base) * h * 0.9;
+        var bb = (base + 3) + (GOLD[2] - (base + 3)) * h * 0.9;
+        ctx.fillStyle = "rgb(" + (rr | 0) + "," + (gg | 0) + "," + (bb | 0) + ")";
+        ctx.beginPath();
+        ctx.moveTo(t.p[0][0], t.p[0][1]);
+        ctx.lineTo(t.p[1][0], t.p[1][1]);
+        ctx.lineTo(t.p[2][0], t.p[2][1]);
+        ctx.closePath();
+        ctx.fill();
+      }
+      return anyHot;
+    }
+
+    function loop(now) {
+      draw(now);
+      rafId = running ? window.requestAnimationFrame(loop) : null;
+    }
+    function start() {
+      if (!running) {
+        running = true;
+        rafId = window.requestAnimationFrame(loop);
+      }
+    }
+    function stop() {
+      running = false;
+      if (rafId) { window.cancelAnimationFrame(rafId); rafId = null; }
+    }
+
+    build();
+
+    if (REDUCED_MOTION) {
+      draw(0); // one calm, static field
+      window.addEventListener("resize", debounce(function () { build(); draw(0); }, 200));
+      return;
+    }
+
+    hero.addEventListener("pointermove", function (e) {
+      var rect = canvas.getBoundingClientRect();
+      pointer.x = e.clientX - rect.left;
+      pointer.y = e.clientY - rect.top;
+    });
+    hero.addEventListener("pointerleave", function () {
+      pointer.x = -9999;
+      pointer.y = -9999;
+    });
+    hero.addEventListener("pointerdown", function (e) {
+      // Tap pulse — a burst of heat around the touch point
+      var rect = canvas.getBoundingClientRect();
+      var px = e.clientX - rect.left, py = e.clientY - rect.top;
+      tris.forEach(function (t) {
+        var d = Math.hypot(t.cx - px, t.cy - py);
+        if (d < 260) { t.heat = Math.max(t.heat, (1 - d / 260)); }
+      });
+    });
+
+    // Only burn frames while the hero is actually on screen
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (entries) {
+        entries[0].isIntersecting ? start() : stop();
+      }, { threshold: 0.02 }).observe(hero);
+    } else {
+      start();
+    }
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) { stop(); }
+      else if (hero.getBoundingClientRect().bottom > 0) { start(); }
+    });
+    window.addEventListener("resize", debounce(build, 200));
+  }
+
+  function debounce(fn, wait) {
+    var t = null;
+    return function () {
+      window.clearTimeout(t);
+      t = window.setTimeout(fn, wait);
+    };
+  }
+
+  /** Featured match card leans toward the pointer (fine pointers only). */
+  function initTilt() {
+    if (REDUCED_MOTION ||
+        !window.matchMedia("(hover: hover) and (pointer: fine)").matches) { return; }
+    var card = document.querySelector(".featured-card");
+    if (!card) { return; }
+
+    card.addEventListener("pointermove", function (e) {
+      var rect = card.getBoundingClientRect();
+      var nx = (e.clientX - rect.left) / rect.width - 0.5;
+      var ny = (e.clientY - rect.top) / rect.height - 0.5;
+      card.classList.add("is-tilting");
+      card.style.setProperty("--tilt-y", (nx * 3.5).toFixed(2) + "deg");
+      card.style.setProperty("--tilt-x", (ny * -2.5).toFixed(2) + "deg");
+    });
+    card.addEventListener("pointerleave", function () {
+      card.classList.remove("is-tilting");
+      card.style.setProperty("--tilt-y", "0deg");
+      card.style.setProperty("--tilt-x", "0deg");
+    });
+  }
+
+  /* ------------------------------------------------------------------------
      7. CHROME — header, menu, progress, parallax, reveals, counters, spy
      ------------------------------------------------------------------------ */
 
@@ -508,6 +809,7 @@
   function initScrollLoop() {
     var header = document.querySelector(".site-header");
     var bar = document.getElementById("progress-bar");
+    var watermark = REDUCED_MOTION ? null : document.getElementById("hero-watermark");
     var layers = REDUCED_MOTION ? [] :
       Array.prototype.slice.call(document.querySelectorAll("[data-parallax]"));
     var ticking = false;
@@ -521,6 +823,11 @@
       if (bar) {
         var max = document.documentElement.scrollHeight - window.innerHeight;
         bar.style.transform = "scaleX(" + (max > 0 ? Math.min(y / max, 1) : 0) + ")";
+      }
+
+      // Kinetic wordmark: drifts left as you leave the hero
+      if (watermark && y < window.innerHeight * 1.5) {
+        watermark.style.transform = "translate3d(" + (-y * 0.18).toFixed(1) + "px,0,0)";
       }
 
       var vh = window.innerHeight;
@@ -688,6 +995,7 @@
     initFooterYear();
     initScrollSpy();
     initHeroMarquee();
+    initHeroField();
 
     loadData()
       .then(function (data) {
@@ -696,6 +1004,7 @@
         renderClub(data.teamInfo);
         initReveals();
         initCounters();
+        initTilt();
       })
       .catch(function (err) {
         console.error("Falcons RFC: could not load site data.", err);

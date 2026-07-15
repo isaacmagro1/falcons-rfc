@@ -110,11 +110,22 @@ everything. On mobile the links move into a **full-screen overlay menu**
 (burger → X, staggered link entrance, Esc/link-tap closes, body scroll locks).
 
 ### Hero
-Left-aligned editorial block: crest eyebrow → outline/solid display title →
-tagline → two CTAs. A **next-match card** docks right on desktop (crest v
-crest, KO chip, date/venue, link to fixtures) — rendered by JS from the same
-data as the fixtures. The base of the hero carries a rolling **ticker** of
-club lines. Background parallaxes slowly behind it all.
+Left-aligned editorial block: crest eyebrow → outline/solid display title
+(lines slide out of clipped masks on load) → tagline → two CTAs. A
+**next-match card** docks right on desktop (crest v crest, KO chip,
+date/venue, a **live countdown** ticking to matchday/kick-off, link to
+fixtures) — rendered by JS from the same data as the fixtures. The base of
+the hero carries a rolling **ticker**; a giant outlined **FALCONS wordmark**
+drifts with the scroll behind the content.
+
+**The living background** (`js/script.js: initHeroField`): a full-bleed
+canvas mesh of jittered jersey triangles in near-black inks. Facets ignite
+gold around the pointer and decay back (a torch-over-fabric trail), random
+facets glint ambiently (~2/s), a floodlight band sweeps across every ~9s,
+and taps pulse a burst — so touch devices get the show too. The rAF loop
+only runs while the hero is on screen and the tab is visible; DPR is capped
+at 1.5; reduced motion draws one static field. The CSS gradient beneath is
+the no-JS floor.
 
 ### Fixtures — the gold field
 - **Featured panel**: the next fixture (or today's match) as a full-width
@@ -174,12 +185,16 @@ either moves (marquees, parallax) or enters with motion (reveals, count-ups).
 - **Durations:** press 140ms · hovers 200ms · reveals 500ms · title masks
   700ms · clip reveals 800ms (entrances may sit above 300ms; interactions
   never do).
-- **Always moving:** the hero ticker and partner marquee roll continuously
-  (linear, speed normalised to px/s), pausing on hover/focus so they can be
-  read. The scroll-progress bar and header state track every scroll.
-- **Scroll-linked:** one rAF loop drives header shrink, the progress bar and
-  the **parallax layers** (`data-parallax` on hero + banner backgrounds;
-  offset zeroed at viewport centre and clamped so edges never show).
+- **Always moving:** the hero triangle field, ticker, partner marquee and
+  the countdown never sit still (marquees pause on hover/focus so they can
+  be read). The scroll-progress bar and header state track every scroll.
+- **Scroll-linked:** one rAF loop drives header shrink, the progress bar,
+  the hero **wordmark drift** and the banner **parallax layer**
+  (`data-parallax`; offset zeroed at viewport centre and clamped so edges
+  never show).
+- **Pointer-reactive:** the hero field ignites around the cursor; the
+  featured match card **tilts** toward it (±3°, fine pointers only); the
+  fixture rail **skews with scroll velocity** (±4°, eases back upright).
 - **Entrances:** `.reveal` keyframe fade-up with 45ms sibling stagger;
   `.t-line` line-mask slide for display titles (transition, so it stays
   interruptible); `.reveal--clip` wipe for photography; hero cascade on load

@@ -74,13 +74,20 @@
 
   <!-- ============ HERO ============ -->
   <section class="hero" aria-label="Welcome">
-    <div class="hero__bg" data-parallax="0.22" aria-hidden="true"></div>
+    <!-- Living background: jersey-triangle mesh that ignites gold around the
+         pointer, glints on its own, and sweeps a floodlight every few seconds.
+         Painted by js/script.js; the CSS gradient beneath is the no-JS floor. -->
+    <div class="hero__bg" aria-hidden="true">
+      <canvas class="hero__canvas" id="hero-canvas"></canvas>
+    </div>
+    <p class="hero__watermark" id="hero-watermark" aria-hidden="true">Falcons</p>
+
     <div class="hero__inner container">
       <div class="hero__copy">
         <p class="hero__eyebrow"><img src="assets/img/falcons-mark.png" alt="" width="34" height="19" /> Falcons Rugby Football Club</p>
         <h1 class="hero__title">
-          <span class="hero__line hero__line--outline">Rugby in</span>
-          <span class="hero__line">Black <em class="amp">&amp;</em> <em class="gold">Gold</em></span>
+          <span class="hero__mask"><span class="hero__line hero__line--outline">Rugby in</span></span>
+          <span class="hero__mask"><span class="hero__line">Black <em class="amp">&amp;</em> <em class="gold">Gold</em></span></span>
         </h1>
         <p class="hero__tagline">Malta Rugby Championship &bull; Prestige Cup &bull; San Pawl il-Baħar</p>
         <div class="hero__actions">

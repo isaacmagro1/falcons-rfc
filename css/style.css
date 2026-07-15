@@ -609,21 +609,45 @@ button {
   background: var(--black);
 }
 
-/* Parallax layer — oversized so the shift never exposes an edge */
+/* Living background: the canvas triangle field over a gradient floor
+   (the floor is all a no-JS visitor sees, and it still reads on-brand) */
 .hero__bg {
   position: absolute;
-  inset: -14% 0;
+  inset: 0;
   z-index: 0;
   background:
-    linear-gradient(100deg,
-      rgba(10, 10, 11, 0.9) 25%,
-      rgba(10, 10, 11, 0.55) 65%,
-      rgba(10, 10, 11, 0.72) 100%),
     radial-gradient(110% 50% at 78% 100%,
-      rgba(253, 185, 21, 0.2) 0%,
+      rgba(253, 185, 21, 0.14) 0%,
       rgba(253, 185, 21, 0) 60%),
-    url("../assets/img/pattern-hero.jpg") center / cover no-repeat;
+    linear-gradient(160deg, #101014 0%, #0A0A0B 55%, #0D0C09 100%);
+}
+.hero__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Giant kinetic wordmark — slides with the scroll behind the content */
+.hero__watermark {
+  position: absolute;
+  z-index: 0;
+  left: -0.04em;
+  bottom: 2.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(7rem, 24vw, 21rem);
+  line-height: 0.8;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(244, 241, 233, 0.14);
+  pointer-events: none;
+  user-select: none;
   will-change: transform;
+}
+@supports not (-webkit-text-stroke: 1px #fff) {
+  .hero__watermark { color: rgba(244, 241, 233, 0.05); }
 }
 
 .hero__inner {
@@ -643,20 +667,31 @@ button {
   }
 }
 
-/* One-time entrance, staggered 70ms per element. Page load is rare,
-   so it can afford delight — but stays fast (last element settles ~700ms). */
+/* One-time entrance. Title lines slide out of clipped masks (print-press
+   feel); the rest fades up. Last element settles ~800ms. */
 .hero__eyebrow,
-.hero__title .hero__line,
 .hero__tagline,
 .hero__actions,
 .hero-card {
   animation: reveal-in 600ms var(--ease-out) both;
 }
-.hero__title .hero__line:nth-child(1) { animation-delay: 70ms; }
-.hero__title .hero__line:nth-child(2) { animation-delay: 140ms; }
-.hero__tagline  { animation-delay: 210ms; }
-.hero__actions  { animation-delay: 280ms; }
-.hero-card      { animation-delay: 350ms; }
+.hero__mask {
+  display: block;
+  overflow: hidden;
+  padding-block-end: 0.06em;
+}
+.hero__mask .hero__line {
+  animation: line-up 750ms var(--ease-out) both;
+}
+.hero__mask:nth-child(1) .hero__line { animation-delay: 80ms; }
+.hero__mask:nth-child(2) .hero__line { animation-delay: 170ms; }
+.hero__tagline  { animation-delay: 300ms; }
+.hero__actions  { animation-delay: 370ms; }
+.hero-card      { animation-delay: 440ms; }
+@keyframes line-up {
+  from { transform: translateY(112%); }
+  to   { transform: translateY(0); }
+}
 
 .hero__eyebrow {
   display: flex;
@@ -801,6 +836,38 @@ button {
   padding: 0.375rem 0.75rem;
 }
 
+/* Live countdown to kick-off — ticks every second */
+.hero-card__count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding-block: var(--s-2) 0.25rem;
+}
+.hero-card__count-num {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.hero-card__count-num i {
+  font-style: normal;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  margin-left: 0.125rem;
+}
+.hero-card__count-label {
+  font-weight: 700;
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
 /* --------------------------------------------------------------------------
    8. MARQUEE — shared ticker mechanics
    -------------------------------------------------------------------------- */
@@ -935,6 +1002,14 @@ button {
     var(--notch) 100%,
     0 calc(100% - var(--notch))
   );
+  /* Pointer tilt (fine pointers only; vars driven by JS) */
+  transform: perspective(1100px)
+             rotateX(var(--tilt-x, 0deg))
+             rotateY(var(--tilt-y, 0deg));
+  transition: transform 300ms var(--ease-out);
+}
+.featured-card.is-tilting {
+  transition: none;
 }
 @media (min-width: 768px) {
   .featured-card {
@@ -1122,11 +1197,14 @@ button {
     var(--notch) 100%,
     0 calc(100% - var(--notch))
   );
+  /* Composed: --rail-skew leans the cards with scroll velocity (set on the
+     track by JS), --card-lift carries the hover raise */
+  transform: skewX(var(--rail-skew, 0deg)) translateY(var(--card-lift, 0));
   transition: transform var(--t-fast) var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
   .match-card:hover {
-    transform: translateY(-4px);
+    --card-lift: -4px;
   }
 }
 
@@ -1732,11 +1810,14 @@ a.sponsor-item { color: inherit; }
     display: none;
   }
 
-  /* No movement: lifts, presses, slides, pulses, photo zoom */
+  /* No movement: lifts, presses, slides, pulses, tilts, skews, photo zoom */
   .btn,
   .btn:hover,
   .btn:active,
+  .match-card,
   .match-card:hover,
+  .featured-card,
+  .featured-card.is-tilting,
   .honour-row:hover,
   .rail-btn:active,
   .nav-burger:active,
@@ -1746,6 +1827,9 @@ a.sponsor-item { color: inherit; }
   .club-photo:hover img {
     transform: none;
     transition-property: background-color, color, border-color, opacity;
+  }
+  .hero__watermark {
+    transform: none !important;
   }
   .menu-overlay li,
   .menu-overlay__foot {
