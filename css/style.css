@@ -1723,6 +1723,8 @@ a.sponsor-item { color: inherit; }
 .field {
   display: grid;
   gap: 0.5rem;
+  /* Top-align: a neighbour's hint text must never stretch this field's input */
+  align-content: start;
 }
 .field label {
   font-weight: 700;

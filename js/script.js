@@ -620,7 +620,7 @@
       surname: { el: document.getElementById("jf-surname"), test: function (v) { return v.trim().length >= 2; } },
       email:   { el: document.getElementById("jf-email"),   test: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); } },
       phone:   { el: document.getElementById("jf-phone"),   test: function (v) { return /^\d{8}$/.test(v.replace(/\D/g, "")); } },
-      age:     { el: document.getElementById("jf-age"),     test: function (v) { var n = parseInt(v, 10); return n >= 5 && n <= 99; } },
+      age:     { el: document.getElementById("jf-age"),     test: function (v) { return v !== ""; } },
       gender:  { el: document.getElementById("jf-gender"),  test: function (v) { return v !== ""; } },
       level:   { el: document.getElementById("jf-level"),   test: function (v) { return v !== ""; } }
     };

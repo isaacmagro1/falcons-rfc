@@ -286,8 +286,16 @@
             </div>
             <div class="field">
               <label for="jf-age">Age</label>
-              <input id="jf-age" name="age" type="number" inputmode="numeric" min="5" max="99" required />
-              <p class="field__error" id="jf-age-error" hidden>Enter an age between 5 and 99.</p>
+              <select id="jf-age" name="age" required>
+                <option value="" selected disabled>Select</option>
+                <option>Under 12</option>
+                <option>12-15</option>
+                <option>16-17</option>
+                <option>18-24</option>
+                <option>25-34</option>
+                <option>35+</option>
+              </select>
+              <p class="field__error" id="jf-age-error" hidden>Pick an age range.</p>
             </div>
           </div>
 
@@ -315,7 +323,7 @@
             </div>
           </div>
 
-          <button class="btn btn--gold join-form__submit" type="submit">Send via WhatsApp</button>
+          <button class="btn btn--gold join-form__submit" type="submit">Submit</button>
           <p class="join-form__note">Submitting opens WhatsApp with your application written out and ready. Press send there to finish.</p>
           <p class="join-form__status" id="join-status" role="status"></p>
         </form>
