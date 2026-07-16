@@ -152,6 +152,16 @@ the no-JS floor.
 non-alphanumerics → `-`. On image error, JS swaps in a gold **initials tile** —
 a new opponent works with zero code changes, with or without a logo file.
 
+### Club standings
+League table from `data/standings.json` (sorted by points, then wins):
+position, crest, club, P/W/D/L, Pts. The Falcons row gets a gold keyline +
+tint. W/D/L columns drop out under 560px. Update the JSON as results land.
+
+### Player standings
+Leader boards from `data/player-stats.json` (players: name/tries/points/
+minutes). Top five render per category; zero-stat players are skipped and
+an empty state shows until the season starts.
+
 ### Stats band
 Four gold-keyline stats (fixtures, years, teams, senior clubs) whose numbers
 **count up** (~1.1s, ease-out cubic) when scrolled into view. The fixtures
@@ -246,8 +256,10 @@ All content is data-driven from `data/`:
 | File              | Drives                                              |
 | ----------------- | --------------------------------------------------- |
 | `matches.json`    | Hero match card, featured panel, rail, fixtures stat |
-| `sponsors.json`   | Spotlight + partner marquee                          |
-| `team-info.json`  | About copy, facts ledger, honours index, social links |
+| `sponsors.json`   | Spotlight + partner logo marquee (logos in assets/img/sponsors/) |
+| `standings.json`  | Club standings table                                 |
+| `player-stats.json` | Player leader boards (tries, points, minutes)      |
+| `team-info.json`  | About copy, facts ledger, honours index, social links, WhatsApp number |
 
 `fetch()` is the source of truth; a build-time copy of the same JSON lives in
 `index.html` (`<script type="application/json" id="fallback-data">`) so the

@@ -1280,6 +1280,168 @@ button {
 }
 
 /* --------------------------------------------------------------------------
+   9b. CLUB STANDINGS — the league table
+   -------------------------------------------------------------------------- */
+.standings {
+  overflow-x: auto;
+}
+.standings__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.standings__table th {
+  padding: 0.625rem 0.75rem;
+  font-weight: 700;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--line);
+}
+.standings__table th.standings__club-h {
+  text-align: left;
+}
+.standings__table td {
+  padding: 0.875rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+.standings__pos {
+  width: 2.75rem;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  text-align: center;
+  color: var(--text-faint);
+}
+.standings__club {
+  min-width: 11rem;
+}
+.standings__club img {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+}
+.standings__club span {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+  vertical-align: middle;
+}
+.standings__num {
+  width: 3rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.standings__pts {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--text);
+}
+.standings__table tr.is-falcons {
+  background: rgba(253, 185, 21, 0.07);
+}
+.standings__table tr.is-falcons td:first-child {
+  border-left: 3px solid var(--gold);
+}
+.standings__table tr.is-falcons .standings__pts {
+  color: var(--gold);
+}
+.standings__note {
+  margin-top: var(--s-3);
+  font-size: 0.875rem;
+  color: var(--text-faint);
+}
+@media (max-width: 560px) {
+  .standings__wdl { display: none; }
+  .standings__club { min-width: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   9c. PLAYER STANDINGS — season leader boards
+   -------------------------------------------------------------------------- */
+.section--players {
+  border-top: 1px solid var(--line);
+}
+.leaders {
+  display: grid;
+  gap: var(--s-4);
+}
+@media (min-width: 768px) {
+  .leaders { grid-template-columns: repeat(3, 1fr); gap: var(--s-5); }
+}
+.leaders__board h3 {
+  margin-bottom: var(--s-1);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.leaders__board ol {
+  counter-reset: leader;
+}
+.leaders__board li {
+  counter-increment: leader;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  padding-block: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+.leaders__board li::before {
+  content: counter(leader, decimal-leading-zero);
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  color: var(--text-faint);
+}
+.leaders__name {
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.leaders__value {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.leaders__value i {
+  font-style: normal;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  margin-left: 0.25rem;
+}
+.leaders__empty {
+  padding: var(--s-5) var(--s-3);
+  text-align: center;
+  border: 1px dashed var(--line);
+  color: var(--text-muted);
+}
+.leaders__empty strong {
+  display: block;
+  margin-bottom: var(--s-1);
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+/* --------------------------------------------------------------------------
    10. STATS — the club in numbers
    -------------------------------------------------------------------------- */
 .stats {
@@ -1416,10 +1578,18 @@ button {
 .sponsor-item {
   position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
   padding-right: calc(var(--s-5) * 2);
   white-space: nowrap;
+}
+.sponsor-item__link {
+  display: flex;
+  align-items: center;
+}
+.sponsor-item__logo {
+  height: clamp(2.75rem, 6vw, 3.75rem);
+  width: auto;
+  max-width: none; /* wide wordmarks keep their shape inside the flex track */
 }
 /* Gold diamond separator, centred in the item's trailing space */
 .sponsor-item::after {
@@ -1446,15 +1616,6 @@ button {
     color: var(--gold);
   }
 }
-.sponsor-item__tag {
-  font-weight: 700;
-  font-size: 0.6875rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  min-height: 1em;
-}
-a.sponsor-item { color: inherit; }
 
 
 /* --------------------------------------------------------------------------
@@ -1951,6 +2112,17 @@ a.sponsor-item { color: inherit; }
 .footer-legal__sep {
   margin-inline: 0.375rem;
   color: var(--text-faint);
+}
+.footer-novum {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  vertical-align: bottom;
+}
+.footer-novum img {
+  width: 15px;
+  height: auto;
+  opacity: 0.85;
 }
 
 .noscript-note {

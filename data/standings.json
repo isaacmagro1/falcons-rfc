@@ -1,0 +1,47 @@
+{
+  "season": "2026/27",
+  "updated": null,
+  "note": "The league kicks off on 10 October. Table updates through the season.",
+  "table": [
+    {
+      "team": "Falcons",
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "points": 0
+    },
+    {
+      "team": "Kavallieri",
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "points": 0
+    },
+    {
+      "team": "Overseas",
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "points": 0
+    },
+    {
+      "team": "Stompers",
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "points": 0
+    },
+    {
+      "team": "UM Wolves",
+      "played": 0,
+      "won": 0,
+      "drawn": 0,
+      "lost": 0,
+      "points": 0
+    }
+  ]
+}

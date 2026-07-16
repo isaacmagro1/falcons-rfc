@@ -27,6 +27,8 @@
     matches: "data/matches.json",
     sponsors: "data/sponsors.json",
     teamInfo: "data/team-info.json",
+    standings: "data/standings.json",
+    playerStats: "data/player-stats.json",
     opponentLogos: "assets/img/opponents/",
     falconsMark: "assets/img/falcons-mark.png"
   };
@@ -115,9 +117,14 @@
     return Promise.all([
       fetchJSON(PATHS.matches),
       fetchJSON(PATHS.sponsors),
-      fetchJSON(PATHS.teamInfo)
+      fetchJSON(PATHS.teamInfo),
+      fetchJSON(PATHS.standings),
+      fetchJSON(PATHS.playerStats)
     ]).then(function (results) {
-      return { matches: results[0], sponsors: results[1], teamInfo: results[2] };
+      return {
+        matches: results[0], sponsors: results[1], teamInfo: results[2],
+        standings: results[3], playerStats: results[4]
+      };
     }).catch(function (err) {
       var inline = document.getElementById("fallback-data");
       if (inline) {
@@ -164,7 +171,7 @@
   /** Home side renders on the left, away side on the right (m.home === false
       means Falcons are away, so they take the right slot). Unknown → left. */
   function teamsBlockHTML(m) {
-    var opponentName = m.opponent || "Finalist TBC";
+    var opponentName = m.opponent || "Opponent TBC";
     var opponentLogo = m.opponent ? opponentLogoPath(m.opponent) : null;
     var ko = m.time ? esc(m.time) : "KO TBC";
     var falcons = teamHTML("Falcons", PATHS.falconsMark);
@@ -471,13 +478,15 @@
   }
 
   function sponsorItemHTML(s) {
-    var name = s.website
-      ? '<a class="sponsor-item__name" href="' + esc(s.website) + '" target="_blank" rel="noopener">' + esc(s.name) + "</a>"
+    // Logo wall: the logo is the item (name rides along as alt text);
+    // sponsors without a file fall back to their name in display type
+    var inner = s.logo
+      ? '<img class="sponsor-item__logo" src="' + esc(s.logo) + '" alt="' + esc(s.name) + '" loading="lazy" />'
       : '<span class="sponsor-item__name">' + esc(s.name) + "</span>";
-    return (
-      '<li class="sponsor-item">' + name +
-      '<span class="sponsor-item__tag">' + esc(s.tagline || "") + "</span></li>"
-    );
+    if (s.website) {
+      inner = '<a class="sponsor-item__link" href="' + esc(s.website) + '" target="_blank" rel="noopener">' + inner + "</a>";
+    }
+    return '<li class="sponsor-item">' + inner + "</li>";
   }
 
   /**
@@ -599,6 +608,86 @@
         return '<li><a href="' + esc(s.url) + '" target="_blank" rel="noopener">' +
                icon + "<span>" + esc(s.platform) + "</span></a></li>";
       }).join("");
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     5b. STANDINGS & PLAYER LEADERS — updated through the season via
+     data/standings.json and data/player-stats.json
+     ------------------------------------------------------------------------ */
+
+  function renderStandings(data) {
+    var host = document.getElementById("standings-table");
+    if (!host || !data || !Array.isArray(data.table)) { return; }
+
+    var rows = data.table.slice().sort(function (a, b) {
+      return (b.points - a.points) ||
+             ((b.won || 0) - (a.won || 0)) ||
+             String(a.team).localeCompare(String(b.team));
+    });
+
+    var body = rows.map(function (r, i) {
+      var isFalcons = String(r.team).toLowerCase() === "falcons";
+      return (
+        "<tr" + (isFalcons ? ' class="is-falcons"' : "") + ">" +
+          '<td class="standings__pos">' + (i + 1) + "</td>" +
+          '<td class="standings__club"><img src="' + esc(opponentLogoPath(r.team)) + '" alt="" loading="lazy" ' +
+            'onerror="this.remove()" /><span>' + esc(r.team) + "</span></td>" +
+          '<td class="standings__num">' + (r.played || 0) + "</td>" +
+          '<td class="standings__num standings__wdl">' + (r.won || 0) + "</td>" +
+          '<td class="standings__num standings__wdl">' + (r.drawn || 0) + "</td>" +
+          '<td class="standings__num standings__wdl">' + (r.lost || 0) + "</td>" +
+          '<td class="standings__num standings__pts">' + (r.points || 0) + "</td>" +
+        "</tr>"
+      );
+    }).join("");
+
+    host.innerHTML =
+      '<table class="standings__table">' +
+        "<thead><tr>" +
+          '<th scope="col"><span class="visually-hidden">Position</span>#</th>' +
+          '<th scope="col" class="standings__club-h">Club</th>' +
+          '<th scope="col">P</th>' +
+          '<th scope="col" class="standings__wdl">W</th>' +
+          '<th scope="col" class="standings__wdl">D</th>' +
+          '<th scope="col" class="standings__wdl">L</th>' +
+          '<th scope="col">Pts</th>' +
+        "</tr></thead><tbody>" + body + "</tbody></table>" +
+      (data.note ? '<p class="standings__note">' + esc(data.note) + "</p>" : "");
+  }
+
+  function leadersBoardHTML(label, players, key, unit) {
+    var top = players
+      .filter(function (p) { return (p[key] || 0) > 0; })
+      .sort(function (a, b) { return (b[key] || 0) - (a[key] || 0); })
+      .slice(0, 5);
+    if (!top.length) { return ""; }
+    return (
+      '<div class="leaders__board">' +
+        "<h3>" + esc(label) + "</h3>" +
+        "<ol>" + top.map(function (p) {
+          return "<li><span class=\"leaders__name\">" + esc(p.name) + "</span>" +
+                 '<span class="leaders__value">' + (p[key] || 0) +
+                 (unit ? "<i>" + unit + "</i>" : "") + "</span></li>";
+        }).join("") + "</ol>" +
+      "</div>"
+    );
+  }
+
+  function renderPlayers(data) {
+    var host = document.getElementById("players-boards");
+    if (!host || !data) { return; }
+    var players = Array.isArray(data.players) ? data.players : [];
+    var boards =
+      leadersBoardHTML("Tries", players, "tries", "") +
+      leadersBoardHTML("Points", players, "points", "") +
+      leadersBoardHTML("Minutes played", players, "minutes", "min");
+    if (boards) {
+      host.innerHTML = boards;
+    } else {
+      host.innerHTML =
+        '<div class="leaders__empty"><strong>Season not started</strong>' +
+        esc(data.note || "Player stats land after Matchday 1.") + "</div>";
     }
   }
 
@@ -1096,6 +1185,8 @@
       .then(function (data) {
         renderMatches(data.matches, todayISO());
         renderSponsors(data.sponsors);
+        renderStandings(data.standings);
+        renderPlayers(data.playerStats);
         renderClub(data.teamInfo);
         initJoinForm(data.teamInfo.whatsapp);
         initReveals();

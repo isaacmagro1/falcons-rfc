@@ -1,67 +1,67 @@
 {
-  "note": "Sponsor roster from the Falcons RFC branding guide, season 2026. Drop a logo file into assets/img/sponsors/ and set its path in \"logo\" to replace the monogram tile.",
+  "note": "Roster and logo files from the club's Sponsorship Logos folder. Set \"website\" to link a sponsor out.",
   "sponsors": [
     {
-      "name": "Cisk Pilsner",
+      "name": "Dalton Reefers",
       "tier": "main",
       "tagline": "Season 2026/27",
-      "logo": null,
+      "logo": "assets/img/sponsors/dalton-reefers.png",
+      "website": null
+    },
+    {
+      "name": "Cisk",
+      "tier": "partner",
+      "tagline": null,
+      "logo": "assets/img/sponsors/cisk.png",
       "website": null
     },
     {
       "name": "Deefort",
       "tier": "partner",
       "tagline": "Official Kit Partner",
-      "logo": null,
+      "logo": "assets/img/sponsors/deefort.png",
       "website": null
     },
     {
-      "name": "The San Paolo",
-      "tier": "partner",
-      "tagline": "San Pawl il-Baħar",
-      "logo": null,
-      "website": null
-    },
-    {
-      "name": "Dalton Reefer's Ltd",
+      "name": "San Paolo Naufrago",
       "tier": "partner",
       "tagline": null,
-      "logo": null,
+      "logo": "assets/img/sponsors/san-paolo-naufrago.png",
       "website": null
     },
     {
       "name": "Portughes",
       "tier": "partner",
       "tagline": null,
-      "logo": null,
+      "logo": "assets/img/sponsors/portughes.png",
       "website": null
     },
     {
       "name": "Prestige",
       "tier": "partner",
       "tagline": "Prestige Cup Partner",
-      "logo": null,
+      "logo": "assets/img/sponsors/prestige.png",
       "website": null
     },
     {
       "name": "Lemon Soda",
       "tier": "partner",
       "tagline": null,
-      "logo": null,
+      "logo": "assets/img/sponsors/lemon-soda.png",
       "website": null
     },
     {
       "name": "Martina's",
       "tier": "partner",
       "tagline": null,
-      "logo": null,
+      "logo": "assets/img/sponsors/martinas.png",
       "website": null
     },
     {
       "name": "Heels & Keys",
       "tier": "partner",
       "tagline": "Key Cutting & Shoe Repair",
-      "logo": null,
+      "logo": "assets/img/sponsors/heels-keys.png",
       "website": null
     }
   ]
