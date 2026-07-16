@@ -658,39 +658,65 @@
       (data.note ? '<p class="standings__note">' + esc(data.note) + "</p>" : "");
   }
 
-  function leadersBoardHTML(label, players, key, unit) {
-    var top = players
-      .filter(function (p) { return (p[key] || 0) > 0; })
-      .sort(function (a, b) { return (b[key] || 0) - (a[key] || 0); })
-      .slice(0, 5);
-    if (!top.length) { return ""; }
-    return (
-      '<div class="leaders__board">' +
-        "<h3>" + esc(label) + "</h3>" +
-        "<ol>" + top.map(function (p) {
-          return "<li><span class=\"leaders__name\">" + esc(p.name) + "</span>" +
-                 '<span class="leaders__value">' + (p[key] || 0) +
-                 (unit ? "<i>" + unit + "</i>" : "") + "</span></li>";
-        }).join("") + "</ol>" +
-      "</div>"
-    );
-  }
-
-  function renderPlayers(data) {
+  /**
+   * Full squad stats table. Every squad member renders immediately (zeros
+   * pre-season); values come from data/player-stats.json keyed by the exact
+   * player name, and the table re-sorts itself as stats land.
+   */
+  function renderPlayers(data, squad) {
     var host = document.getElementById("players-boards");
-    if (!host || !data) { return; }
-    var players = Array.isArray(data.players) ? data.players : [];
-    var boards =
-      leadersBoardHTML("Tries", players, "tries", "") +
-      leadersBoardHTML("Points", players, "points", "") +
-      leadersBoardHTML("Minutes played", players, "minutes", "min");
-    if (boards) {
-      host.innerHTML = boards;
-    } else {
-      host.innerHTML =
-        '<div class="leaders__empty"><strong>Season not started</strong>' +
-        esc(data.note || "Player stats land after Matchday 1.") + "</div>";
-    }
+    if (!host) { return; }
+
+    var stats = {};
+    ((data && data.players) || []).forEach(function (p) {
+      stats[String(p.name)] = p;
+    });
+
+    var rows = [];
+    (((squad || {}).units) || []).forEach(function (unit) {
+      (unit.positions || []).forEach(function (pos) {
+        (pos.players || []).forEach(function (name) {
+          var s = stats[name] || {};
+          rows.push({
+            name: name,
+            position: pos.position,
+            tries: s.tries || 0,
+            points: s.points || 0,
+            minutes: s.minutes || 0
+          });
+        });
+      });
+    });
+    if (!rows.length) { return; }
+
+    rows.sort(function (a, b) {
+      return (b.points - a.points) || (b.tries - a.tries) ||
+             (b.minutes - a.minutes) || a.name.localeCompare(b.name);
+    });
+
+    var body = rows.map(function (r, i) {
+      return (
+        "<tr>" +
+          '<td class="standings__pos">' + (i + 1) + "</td>" +
+          '<td class="ptable__player"><span class="ptable__name">' + esc(r.name) + "</span>" +
+            '<span class="ptable__position">' + esc(r.position) + "</span></td>" +
+          '<td class="standings__num">' + r.tries + "</td>" +
+          '<td class="standings__num">' + r.points + "</td>" +
+          '<td class="standings__num standings__pts">' + r.minutes + "</td>" +
+        "</tr>"
+      );
+    }).join("");
+
+    host.innerHTML =
+      '<table class="standings__table ptable">' +
+        "<thead><tr>" +
+          '<th scope="col"><span class="visually-hidden">Rank</span>#</th>' +
+          '<th scope="col" class="standings__club-h">Player</th>' +
+          '<th scope="col" title="Tries">T</th>' +
+          '<th scope="col" title="Points">Pts</th>' +
+          '<th scope="col" title="Minutes played">Min</th>' +
+        "</tr></thead><tbody>" + body + "</tbody></table>" +
+      ((data && data.note) ? '<p class="standings__note">' + esc(data.note) + "</p>" : "");
   }
 
   /* ------------------------------------------------------------------------
@@ -1216,7 +1242,7 @@
         renderMatches(data.matches, todayISO());
         renderSponsors(data.sponsors);
         renderStandings(data.standings);
-        renderPlayers(data.playerStats);
+        renderPlayers(data.playerStats, data.squad);
         renderSquad(data.squad);
         renderClub(data.teamInfo);
         initJoinForm(data.teamInfo.whatsapp);
