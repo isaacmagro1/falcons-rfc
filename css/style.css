@@ -447,8 +447,8 @@ button {
     border-bottom-color: var(--gold);
   }
 }
-/* Scrollspy: JS marks the section in view */
-.nav-links a[aria-current="true"] {
+/* Scrollspy marks the section in view; team.html marks itself as page */
+.nav-links a[aria-current] {
   color: var(--gold);
   border-bottom-color: var(--gold);
 }
@@ -1587,9 +1587,11 @@ button {
   align-items: center;
 }
 .sponsor-item__logo {
-  height: clamp(2.75rem, 6vw, 3.75rem);
-  width: auto;
-  max-width: none; /* wide wordmarks keep their shape inside the flex track */
+  /* Uniform bounding box: wide wordmarks scale down, tall marks cap at the
+     box height, so every partner reads at the same visual weight */
+  width: 8.5rem;
+  height: 3.5rem;
+  object-fit: contain;
 }
 /* Gold diamond separator, centred in the item's trailing space */
 .sponsor-item::after {
@@ -1781,37 +1783,114 @@ button {
 }
 
 /* --------------------------------------------------------------------------
-   13. BANNER — matchday call-out over the split-pattern photo
+   13a. TEAM PAGE — photo hero + squad by position
    -------------------------------------------------------------------------- */
-.banner {
+.team-hero {
   position: relative;
-  overflow: hidden;
-  padding-block: var(--s-7);
-}
-.banner__bg {
-  position: absolute;
-  inset: -18% 0;
-  background:
-    linear-gradient(100deg, rgba(10, 10, 11, 0.9) 30%, rgba(10, 10, 11, 0.5)),
-    url("../assets/img/banner-split.jpg") center / cover no-repeat;
-  will-change: transform;
-}
-.banner__inner {
-  position: relative;
+  min-height: 62svh;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--s-2);
+  align-items: flex-end;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(10, 10, 11, 0.55), rgba(10, 10, 11, 0.9)),
+    url("../assets/img/pattern-hero.jpg") center / cover no-repeat;
 }
-.banner__line {
+.team-hero__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+.team-hero::after {
+  /* Readability floor over the photo */
+  content: "";
+  position: absolute;
+  inset: 40% 0 0 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(10, 10, 11, 0), rgba(10, 10, 11, 0.88));
+}
+.team-hero__inner {
+  position: relative;
+  z-index: 2;
+  padding-block: calc(var(--header-h) + 5rem) var(--s-5);
+}
+.team-hero__title {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  line-height: 1.05;
+  font-weight: 400;
+  font-size: clamp(3rem, 12vw, 7rem);
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+.team-hero__sub {
+  margin-top: var(--s-2);
+  color: var(--text-muted);
+  max-width: 44ch;
+}
+/* Until the photo file exists, say so quietly */
+.team-hero.no-photo .team-hero__sub::after {
+  content: " Full squad photo coming soon.";
+  color: var(--text-faint);
+}
+
+.squad {
+  display: grid;
+  gap: var(--s-6);
+}
+.squad-unit__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 4.5vw, 2.5rem);
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  max-width: 18ch;
+  color: var(--gold);
+  margin-bottom: var(--s-2);
 }
-.banner .btn { margin-top: var(--s-2); }
+.squad-pos {
+  display: grid;
+  gap: var(--s-1) var(--s-4);
+  padding-block: var(--s-3);
+  border-top: 1px solid var(--line);
+}
+@media (min-width: 768px) {
+  .squad-pos {
+    grid-template-columns: 220px 1fr;
+    align-items: baseline;
+  }
+}
+.squad-pos__label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.squad-pos__players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+}
+.squad-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--ink-800), var(--ink-900));
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition: border-color var(--t-fast) ease, color var(--t-fast) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .squad-chip:hover {
+    border-color: var(--line-gold);
+    color: var(--gold);
+  }
+}
 
 /* --------------------------------------------------------------------------
    13b. JOIN — training application form

@@ -29,6 +29,7 @@
     teamInfo: "data/team-info.json",
     standings: "data/standings.json",
     playerStats: "data/player-stats.json",
+    squad: "data/squad.json",
     opponentLogos: "assets/img/opponents/",
     falconsMark: "assets/img/falcons-mark.png"
   };
@@ -119,11 +120,12 @@
       fetchJSON(PATHS.sponsors),
       fetchJSON(PATHS.teamInfo),
       fetchJSON(PATHS.standings),
-      fetchJSON(PATHS.playerStats)
+      fetchJSON(PATHS.playerStats),
+      fetchJSON(PATHS.squad)
     ]).then(function (results) {
       return {
         matches: results[0], sponsors: results[1], teamInfo: results[2],
-        standings: results[3], playerStats: results[4]
+        standings: results[3], playerStats: results[4], squad: results[5]
       };
     }).catch(function (err) {
       var inline = document.getElementById("fallback-data");
@@ -692,6 +694,34 @@
   }
 
   /* ------------------------------------------------------------------------
+     5c. SQUAD — positions and players (team.html), from data/squad.json
+     ------------------------------------------------------------------------ */
+
+  function renderSquad(data) {
+    var host = document.getElementById("squad-units");
+    if (!host || !data || !Array.isArray(data.units)) { return; }
+    host.innerHTML = data.units.map(function (unit) {
+      var rows = (unit.positions || []).map(function (pos) {
+        var chips = (pos.players || []).map(function (name) {
+          return '<span class="squad-chip">' + esc(name) + "</span>";
+        }).join("");
+        return (
+          '<div class="squad-pos reveal">' +
+            '<h4 class="squad-pos__label">' + esc(pos.position) + "</h4>" +
+            '<div class="squad-pos__players">' + chips + "</div>" +
+          "</div>"
+        );
+      }).join("");
+      return (
+        '<div class="squad-unit">' +
+          '<h3 class="squad-unit__title"><span class="t-line"><span>' + esc(unit.unit) + "</span></span></h3>" +
+          rows +
+        "</div>"
+      );
+    }).join("");
+  }
+
+  /* ------------------------------------------------------------------------
      6a. JOIN FORM — training application, delivered over WhatsApp
      The form composes a structured application message and opens WhatsApp
      (wa.me deep link) with it addressed to the club number from
@@ -1187,6 +1217,7 @@
         renderSponsors(data.sponsors);
         renderStandings(data.standings);
         renderPlayers(data.playerStats);
+        renderSquad(data.squad);
         renderClub(data.teamInfo);
         initJoinForm(data.teamInfo.whatsapp);
         initReveals();

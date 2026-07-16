@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Squad | Falcons RFC</title>
+  <meta name="description" content="The Falcons RFC first team squad for season 2026/27: every position, every player, and the season's player standings." />
+  <meta name="theme-color" content="#0A0A0B" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="The Squad | Falcons RFC" />
+  <meta property="og:description" content="The Falcons RFC first team, position by position, plus 2026/27 player standings." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://isaacmagro1.github.io/falcons-rfc/team.html" />
+  <meta property="og:image" content="https://isaacmagro1.github.io/falcons-rfc/assets/img/falcons-logo.png" />
+
+  <link rel="icon" type="image/png" href="assets/img/favicon.png" />
+
+  <link rel="preload" href="assets/fonts/anton-regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/fonts/glacial-regular.woff2" as="font" type="font/woff2" crossorigin />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Reveal/entrance styles only apply when JS will actually run them -->
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+
+  <a class="skip-link" href="#squad">Skip to the squad</a>
+
+  <!-- Reading progress — thin gold line under the header -->
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <!-- ============ HEADER / NAV ============ -->
+  <header class="site-header" id="top">
+    <nav class="site-nav container" aria-label="Primary">
+      <a class="nav-brand" href="index.html">
+        <img src="assets/img/falcons-mark.png" alt="" width="44" height="25" />
+        <span class="nav-brand__word">Falcons <em>RFC</em></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#matches">Fixtures</a></li>
+        <li><a href="index.html#standings">Standings</a></li>
+        <li><a href="team.html" aria-current="page">Team</a></li>
+        <li><a href="index.html#sponsors">Partners</a></li>
+        <li><a href="index.html#club">The Club</a></li>
+      </ul>
+      <a class="btn btn--gold nav-cta" href="index.html#join">Join the flock</a>
+      <button class="nav-burger" id="nav-burger" type="button"
+              aria-expanded="false" aria-controls="menu-overlay" aria-label="Open menu">
+        <span></span><span></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Full-screen menu (mobile) -->
+  <div class="menu-overlay" id="menu-overlay" hidden>
+    <nav aria-label="Menu">
+      <ul class="menu-overlay__links">
+        <li style="--i:0"><a href="index.html#matches">Fixtures</a></li>
+        <li style="--i:1"><a href="index.html#standings">Standings</a></li>
+        <li style="--i:2"><a href="team.html">Team</a></li>
+        <li style="--i:3"><a href="index.html#sponsors">Partners</a></li>
+        <li style="--i:4"><a href="index.html#club">The Club</a></li>
+      </ul>
+    </nav>
+    <div class="menu-overlay__foot" style="--i:5">
+      <a class="btn btn--gold" href="index.html#join">Join the flock</a>
+    </div>
+  </div>
+
+  <!-- ============ TEAM HERO — the full-squad photo lands here ============ -->
+  <section class="team-hero" aria-label="The squad">
+    <!-- Drop the team photo at assets/img/team/squad.jpg and it fills this
+         band automatically; until then the jersey pattern holds the space -->
+    <img class="team-hero__photo" src="assets/img/team/squad.jpg"
+         alt="The Falcons RFC first team squad"
+         onerror="this.hidden=true;this.closest('.team-hero').classList.add('no-photo');" />
+    <div class="team-hero__inner container">
+      <h1 class="team-hero__title">
+        <span class="hero__mask"><span class="hero__line hero__line--outline">The</span></span>
+        <span class="hero__mask"><span class="hero__line">Squad</span></span>
+      </h1>
+      <p class="team-hero__sub">The Falcons first team, season 2026/27.</p>
+    </div>
+  </section>
+
+  <main>
+    <!-- ============ SQUAD BY POSITION ============ -->
+    <section class="section section--squad" id="squad" aria-labelledby="squad-title">
+      <div class="container">
+        <header class="section-head">
+          <h2 class="section-head__title" id="squad-title">
+            <span class="t-line"><span>Position<br />by position</span></span>
+          </h2>
+          <p class="section-head__sub">Every player registered for the 2026/27 campaign, forwards first.</p>
+        </header>
+        <div class="squad" id="squad-units"></div>
+      </div>
+    </section>
+
+    <!-- ============ PLAYER STANDINGS ============ -->
+    <section class="section section--players" id="players" aria-labelledby="players-title">
+      <div class="container">
+        <header class="section-head">
+          <h2 class="section-head__title" id="players-title">
+            <span class="t-line"><span>Player<br />standings</span></span>
+          </h2>
+          <p class="section-head__sub">Tries, points and minutes played across season 2026/27. Leaders appear once the season is underway.</p>
+        </header>
+        <div class="leaders reveal" id="players-boards"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="container footer-hero">
+      <p class="footer-hero__line reveal">Up the<br />Falcons<span>.</span></p>
+      <img class="footer-hero__mark reveal" src="assets/img/falcons-mark.png" alt="" width="120" height="67" loading="lazy" />
+    </div>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <p class="footer-brand__name">Falcons RFC</p>
+        <p class="footer-brand__line">Rugby in black &amp; gold.</p>
+      </div>
+      <nav class="footer-col" aria-label="Footer">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="index.html#matches">Fixtures</a></li>
+          <li><a href="index.html#standings">Standings</a></li>
+          <li><a href="team.html">Team</a></li>
+          <li><a href="index.html#club">The Club</a></li>
+        </ul>
+      </nav>
+      <div class="footer-col" id="footer-social">
+        <h3>Follow the Flock</h3>
+        <ul>
+          <!-- Social links rendered by JS -->
+        </ul>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <div class="container footer-legal__inner">
+        <p>&copy; <span id="footer-year">2026</span> Falcons RFC. All rights reserved. <span class="footer-legal__sep" aria-hidden="true">|</span> Website by <a class="footer-novum" href="https://www.novummarketing.co/" target="_blank" rel="noopener"><img src="assets/img/novum.svg" alt="" width="16" height="17" loading="lazy" />Novum Agency</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <noscript>
+    <div class="noscript-note">
+      <p>This page needs JavaScript to show the squad and player standings. Season 2026/27 opens on 10 October 2026: Falcons vs UM Wolves at Marsa.</p>
+    </div>
+  </noscript>
+
+  <!-- Inline copy of data/*.json for file:// viewing; synced with index.html -->
+  <script type="application/json" id="fallback-data">
+  {"matches":{"season":"2026/27","note":"Fixture list, kick-off times and venues from the club's final 2026/27 fixtures sheet.","matches":[{"id":"mrc-md1","competition":"Malta Rugby Championship","round":"Matchday 1","date":"2026-10-10","time":"13:30","opponent":"UM Wolves","venue":"Marsa Rugby Football Pitch","home":false},{"id":"mrc-md3","competition":"Malta Rugby Championship","round":"Matchday 3","date":"2026-10-24","time":"13:30","opponent":"Overseas","venue":"New Hibs Ground","home":false},{"id":"mrc-md4","competition":"Malta Rugby Championship","round":"Matchday 4","date":"2026-11-21","time":"15:45","opponent":"Stompers","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md5","competition":"Malta Rugby Championship","round":"Matchday 5","date":"2026-11-28","time":"15:45","opponent":"Kavallieri","venue":"Marsa Rugby Football Pitch","home":false},{"id":"mrc-md6","competition":"Malta Rugby Championship","round":"Matchday 6","date":"2026-12-05","time":"15:45","opponent":"UM Wolves","venue":"New Hibs Ground","home":true},{"id":"mrc-md8","competition":"Malta Rugby Championship","round":"Matchday 8","date":"2027-01-09","time":"15:45","opponent":"Overseas","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md9","competition":"Malta Rugby Championship","round":"Matchday 9","date":"2027-01-16","time":"13:30","opponent":"Stompers","venue":"New Hibs Ground","home":true},{"id":"mrc-md10","competition":"Malta Rugby Championship","round":"Matchday 10","date":"2027-01-23","time":"13:30","opponent":"Kavallieri","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md11","competition":"Malta Rugby Championship","round":"Matchday 11","date":"2027-01-30","time":"13:30","opponent":"UM Wolves","venue":"New Hibs Ground","home":false},{"id":"mrc-md13","competition":"Malta Rugby Championship","round":"Matchday 13","date":"2027-03-06","time":"13:30","opponent":"Overseas","venue":"Marsa Rugby Football Pitch","home":false},{"id":"mrc-md14","competition":"Malta Rugby Championship","round":"Matchday 14","date":"2027-03-13","time":"15:45","opponent":"Stompers","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md15","competition":"Malta Rugby Championship","round":"Matchday 15","date":"2027-03-20","time":"15:45","opponent":"Kavallieri","venue":"Marsa Rugby Football Pitch","home":false},{"id":"cup-sf","competition":"Prestige Cup","round":"Semi-final","date":"2027-04-10","time":null,"opponent":null,"venue":null,"home":null,"note":"Pairings decided during the season"},{"id":"cup-final","competition":"Prestige Cup","round":"Final","date":"2027-04-24","time":"15:45","opponent":null,"venue":"Marsa Rugby Football Pitch","home":null}]},"sponsors":{"note":"Roster and logo files from the club's Sponsorship Logos folder. Set \"website\" to link a sponsor out.","sponsors":[{"name":"Dalton Reefers","tier":"main","tagline":"Season 2026/27","logo":"assets/img/sponsors/dalton-reefers.png","website":null},{"name":"Cisk","tier":"partner","tagline":null,"logo":"assets/img/sponsors/cisk.png","website":null},{"name":"Deefort","tier":"partner","tagline":"Official Kit Partner","logo":"assets/img/sponsors/deefort.png","website":null},{"name":"San Paolo Naufrago","tier":"partner","tagline":null,"logo":"assets/img/sponsors/san-paolo-naufrago.png","website":null},{"name":"Portughes","tier":"partner","tagline":null,"logo":"assets/img/sponsors/portughes.png","website":null},{"name":"Prestige","tier":"partner","tagline":"Prestige Cup Partner","logo":"assets/img/sponsors/prestige.png","website":null},{"name":"Lemon Soda","tier":"partner","tagline":null,"logo":"assets/img/sponsors/lemon-soda.png","website":null},{"name":"Martina's","tier":"partner","tagline":null,"logo":"assets/img/sponsors/martinas.png","website":null},{"name":"Heels & Keys","tier":"partner","tagline":"Key Cutting & Shoe Repair","logo":"assets/img/sponsors/heels-keys.png","website":null}]},"teamInfo":{"name":"Falcons RFC","shortName":"Falcons","location":"San Pawl il-Baħar, Malta","colors":"Black & Gold","league":"Malta Rugby Championship","cup":"Prestige Cup","grounds":["Marsa Rugby Football Pitch","New Hibs Ground"],"about":["With more than two decades of rugby behind us, Falcons RFC is one of Malta's five senior clubs, competing at the top of the Maltese game in the Malta Rugby Championship and the Prestige Cup. We wear black and gold with intent: every triangle on the jersey is a nod to the flock behind us.","The Falcons have grown into a family club, fielding men's, women's and youth teams. Our women's side was one of the first women's rugby teams in Malta. From Marsa to New Hibs, matchday brings players, supporters, sponsors and volunteers together. Whether you have played all your life or never touched a rugby ball, there is a place for you in the flock."],"honours":[{"title":"Mediterranean Bank Cup","detail":"2nd Division winners, 2013/14 & 2014/15"},{"title":"Women's 7s & 10s Champions","detail":"Both tournament titles, 2013/14 season"},{"title":"Player of the Year","detail":"Kyle Gauci, Malta Rugby Championship"},{"title":"Top Scorer of the Year","detail":"Brendan Dalton, Malta Rugby Championship"}],"social":[{"platform":"Instagram","handle":"@falconsmalta","url":"https://instagram.com/falconsmalta"},{"platform":"Facebook","handle":"Falcons RFC","url":"https://facebook.com/FalconsRFC"}],"whatsapp":null},"standings":{"season":"2026/27","updated":null,"note":"The league kicks off on 10 October. Table updates through the season.","table":[{"team":"Falcons","played":0,"won":0,"drawn":0,"lost":0,"points":0},{"team":"Kavallieri","played":0,"won":0,"drawn":0,"lost":0,"points":0},{"team":"Overseas","played":0,"won":0,"drawn":0,"lost":0,"points":0},{"team":"Stompers","played":0,"won":0,"drawn":0,"lost":0,"points":0},{"team":"UM Wolves","played":0,"won":0,"drawn":0,"lost":0,"points":0}]},"playerStats":{"season":"2026/27","updated":null,"note":"Player stats land after Matchday 1.","players":[]},"squad":{"season":"2026/27","units":[{"unit":"Forwards","positions":[{"position":"Loosehead Props","players":["Andrea Borg","Kyle Micallef","Vince Farrugia","David Agius"]},{"position":"Hookers","players":["Nicholas Azzopardi","Gabriel Scicluna"]},{"position":"Tighthead Props","players":["Terence Galdes","Clive Sciberras"]},{"position":"Second Rows","players":["Martin Barbara","George Elliott","Alexander Role","Cormac Dennehy","Marc Ellis Hooley"]},{"position":"Flankers","players":["Aiden Demicoli","Ryan Felice","Andrew Vella","Mattia Borg"]},{"position":"Number 8","players":["Dimitrije Avramovic","Liam Scicluna"]}]},{"unit":"Backs","positions":[{"position":"Scrum Half","players":["Shehan Sheyamantha","Micheal Buys"]},{"position":"Fly Half","players":["Kyle Gauci","Antoine Barbet","Simon Leymarie"]},{"position":"Centre","players":["Alvaro Moreno","Brendan Dalton","Gary O'Sullivan"]},{"position":"Wing","players":["Ernest Degabriele","Kane Tippett","Henry Pearman","Kristian Sammut","Aidan Isherwood","Jeremy Borg Micallef","Tommy Debono","Harry Waswa"]},{"position":"Fullback","players":["Clement Gruyer","Antoine Chedo","Guillaume Boulvais"]}]}]}}
+  </script>
+
+  <script src="js/script.js" defer></script>
+</body>
+</html>

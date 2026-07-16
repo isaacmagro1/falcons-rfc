@@ -1,0 +1,108 @@
+{
+  "season": "2026/27",
+  "units": [
+    {
+      "unit": "Forwards",
+      "positions": [
+        {
+          "position": "Loosehead Props",
+          "players": [
+            "Andrea Borg",
+            "Kyle Micallef",
+            "Vince Farrugia",
+            "David Agius"
+          ]
+        },
+        {
+          "position": "Hookers",
+          "players": [
+            "Nicholas Azzopardi",
+            "Gabriel Scicluna"
+          ]
+        },
+        {
+          "position": "Tighthead Props",
+          "players": [
+            "Terence Galdes",
+            "Clive Sciberras"
+          ]
+        },
+        {
+          "position": "Second Rows",
+          "players": [
+            "Martin Barbara",
+            "George Elliott",
+            "Alexander Role",
+            "Cormac Dennehy",
+            "Marc Ellis Hooley"
+          ]
+        },
+        {
+          "position": "Flankers",
+          "players": [
+            "Aiden Demicoli",
+            "Ryan Felice",
+            "Andrew Vella",
+            "Mattia Borg"
+          ]
+        },
+        {
+          "position": "Number 8",
+          "players": [
+            "Dimitrije Avramovic",
+            "Liam Scicluna"
+          ]
+        }
+      ]
+    },
+    {
+      "unit": "Backs",
+      "positions": [
+        {
+          "position": "Scrum Half",
+          "players": [
+            "Shehan Sheyamantha",
+            "Micheal Buys"
+          ]
+        },
+        {
+          "position": "Fly Half",
+          "players": [
+            "Kyle Gauci",
+            "Antoine Barbet",
+            "Simon Leymarie"
+          ]
+        },
+        {
+          "position": "Centre",
+          "players": [
+            "Alvaro Moreno",
+            "Brendan Dalton",
+            "Gary O'Sullivan"
+          ]
+        },
+        {
+          "position": "Wing",
+          "players": [
+            "Ernest Degabriele",
+            "Kane Tippett",
+            "Henry Pearman",
+            "Kristian Sammut",
+            "Aidan Isherwood",
+            "Jeremy Borg Micallef",
+            "Tommy Debono",
+            "Harry Waswa"
+          ]
+        },
+        {
+          "position": "Fullback",
+          "players": [
+            "Clement Gruyer",
+            "Antoine Chedo",
+            "Guillaume Boulvais"
+          ]
+        }
+      ]
+    }
+  ]
+}
