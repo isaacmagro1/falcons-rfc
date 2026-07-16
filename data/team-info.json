@@ -5,27 +5,30 @@
   "colors": "Black & Gold",
   "league": "Malta Rugby Championship",
   "cup": "Prestige Cup",
-  "grounds": ["Marsa Rugby Football Pitch", "New Hibs Ground"],
+  "grounds": [
+    "Marsa Rugby Football Pitch",
+    "New Hibs Ground"
+  ],
   "about": [
-    "With more than two decades of rugby behind us, Falcons RFC is one of Malta's five senior clubs, competing at the top of the Maltese game in the Malta Rugby Championship and the Prestige Cup. We wear black and gold with intent — every triangle on the jersey is a nod to the flock behind us.",
-    "The Falcons have grown into a family club, fielding men's, women's and youth teams — our women's side was one of the first women's rugby teams in Malta. From Marsa to New Hibs, matchday brings players, supporters, sponsors and volunteers together. Whether you have played all your life or never touched a rugby ball, there is a place for you in the flock."
+    "With more than two decades of rugby behind us, Falcons RFC is one of Malta's five senior clubs, competing at the top of the Maltese game in the Malta Rugby Championship and the Prestige Cup. We wear black and gold with intent: every triangle on the jersey is a nod to the flock behind us.",
+    "The Falcons have grown into a family club, fielding men's, women's and youth teams. Our women's side was one of the first women's rugby teams in Malta. From Marsa to New Hibs, matchday brings players, supporters, sponsors and volunteers together. Whether you have played all your life or never touched a rugby ball, there is a place for you in the flock."
   ],
   "honours": [
     {
       "title": "Mediterranean Bank Cup",
-      "detail": "2nd Division winners — 2013/14 & 2014/15"
+      "detail": "2nd Division winners, 2013/14 & 2014/15"
     },
     {
       "title": "Women's 7s & 10s Champions",
-      "detail": "Both tournament titles — 2013/14 season"
+      "detail": "Both tournament titles, 2013/14 season"
     },
     {
       "title": "Player of the Year",
-      "detail": "Kyle Gauci — Malta Rugby Championship"
+      "detail": "Kyle Gauci, Malta Rugby Championship"
     },
     {
       "title": "Top Scorer of the Year",
-      "detail": "Brendan Dalton — Malta Rugby Championship"
+      "detail": "Brendan Dalton, Malta Rugby Championship"
     }
   ],
   "social": [

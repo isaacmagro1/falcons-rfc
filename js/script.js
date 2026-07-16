@@ -176,16 +176,17 @@
     return (
       (away ? opponent : falcons) +
       '<span class="match-ko">' + ko +
-        '<span class="visually-hidden"> — ' + reading + "</span></span>" +
+        '<span class="visually-hidden">, ' + reading + "</span></span>" +
       (away ? falcons : opponent)
     );
   }
 
-  /** "Malta Rugby Championship • Matchday 3 • Away" */
+  /** "Malta Rugby Championship • Matchday 3" plus a Home/Away tag. */
   function compLine(m) {
-    return esc(m.competition) +
-      (m.round ? " • " + esc(m.round) : "") +
-      (m.home === true ? " • Home" : m.home === false ? " • Away" : "");
+    var tag = m.home === true ? "Home" : m.home === false ? "Away" : "";
+    return "<span>" + esc(m.competition) +
+      (m.round ? " • " + esc(m.round) : "") + "</span>" +
+      (tag ? '<i class="match-side">' + tag + "</i>" : "");
   }
 
   /** The big "next up" panel at the top of the fixtures section. */
@@ -255,7 +256,7 @@
     // clock would disagree with the simulated day — never show both).
     var dateOverridden = new URLSearchParams(window.location.search).get("date");
     if (m.status === "today" && (!m.time || dateOverridden)) {
-      host.innerHTML = '<span class="hero-card__count-label">It&rsquo;s matchday — up the Falcons</span>';
+      host.innerHTML = '<span class="hero-card__count-label">It&rsquo;s matchday. Up the Falcons</span>';
       host.hidden = false;
       return;
     }
@@ -280,7 +281,7 @@
     function render() {
       var diff = target.getTime() - Date.now();
       if (diff <= 0) {
-        host.innerHTML = '<span class="hero-card__count-label">It&rsquo;s matchday — up the Falcons</span>';
+        host.innerHTML = '<span class="hero-card__count-label">It&rsquo;s matchday. Up the Falcons</span>';
         if (timer) { window.clearInterval(timer); }
         return;
       }
@@ -346,7 +347,7 @@
     var played = all.length - visible.length;
     if (note && played > 0) {
       note.textContent = played + " played fixture" + (played === 1 ? "" : "s") +
-        " hidden — up the Falcons.";
+        " hidden. Up the Falcons.";
       note.hidden = false;
     }
 
@@ -488,11 +489,9 @@
   function renderSponsorMarquee(partners) {
     var marquee = document.getElementById("sponsor-marquee");
     var track = document.getElementById("sponsor-track");
-    var hint = document.querySelector(".sponsors-hint");
     if (!marquee || !track) { return; }
     if (!partners.length) {
       marquee.hidden = true;
-      if (hint) { hint.hidden = true; }
       return;
     }
 
