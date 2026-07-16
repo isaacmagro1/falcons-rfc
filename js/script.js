@@ -567,7 +567,6 @@
     var facts = document.getElementById("club-facts");
     if (facts) {
       var rows = [
-        ["Location", info.location],
         ["Colours", info.colors],
         ["League", info.league],
         ["Cup", info.cup]
@@ -596,10 +595,93 @@
     var footerSocial = document.querySelector("#footer-social ul");
     if (footerSocial && Array.isArray(info.social)) {
       footerSocial.innerHTML = info.social.map(function (s) {
+        var icon = SOCIAL_ICONS[String(s.platform).toLowerCase()] || "";
         return '<li><a href="' + esc(s.url) + '" target="_blank" rel="noopener">' +
-               esc(s.platform) + "</a></li>";
+               icon + "<span>" + esc(s.platform) + "</span></a></li>";
       }).join("");
     }
+  }
+
+  /* ------------------------------------------------------------------------
+     6a. JOIN FORM — training application, delivered over WhatsApp
+     The form composes a structured application message and opens WhatsApp
+     (wa.me deep link) with it addressed to the club number from
+     team-info.json. No backend, nothing stored, nothing sent until the
+     applicant presses send inside WhatsApp.
+     ------------------------------------------------------------------------ */
+
+  function initJoinForm(whatsapp) {
+    var form = document.getElementById("join-form");
+    if (!form) { return; }
+    var status = document.getElementById("join-status");
+
+    var fields = {
+      name:    { el: document.getElementById("jf-name"),    test: function (v) { return v.trim().length >= 2; } },
+      surname: { el: document.getElementById("jf-surname"), test: function (v) { return v.trim().length >= 2; } },
+      email:   { el: document.getElementById("jf-email"),   test: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); } },
+      phone:   { el: document.getElementById("jf-phone"),   test: function (v) { return /^\d{8}$/.test(v.replace(/\D/g, "")); } },
+      age:     { el: document.getElementById("jf-age"),     test: function (v) { var n = parseInt(v, 10); return n >= 5 && n <= 99; } },
+      gender:  { el: document.getElementById("jf-gender"),  test: function (v) { return v !== ""; } },
+      level:   { el: document.getElementById("jf-level"),   test: function (v) { return v !== ""; } }
+    };
+
+    function setValid(key, ok) {
+      var f = fields[key];
+      var wrap = f.el.closest(".field");
+      var error = document.getElementById("jf-" + key + "-error");
+      if (wrap) { wrap.classList.toggle("is-invalid", !ok); }
+      if (error) { error.hidden = ok; }
+      f.el.setAttribute("aria-invalid", ok ? "false" : "true");
+    }
+
+    Object.keys(fields).forEach(function (key) {
+      // Validate on blur, clear the flag as soon as the fix is typed
+      fields[key].el.addEventListener("blur", function () {
+        if (fields[key].el.value !== "") {
+          setValid(key, fields[key].test(fields[key].el.value));
+        }
+      });
+      fields[key].el.addEventListener("input", function () {
+        if (fields[key].test(fields[key].el.value)) { setValid(key, true); }
+      });
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var firstInvalid = null;
+      Object.keys(fields).forEach(function (key) {
+        var ok = fields[key].test(fields[key].el.value);
+        setValid(key, ok);
+        if (!ok && !firstInvalid) { firstInvalid = fields[key].el; }
+      });
+      if (firstInvalid) {
+        firstInvalid.focus();
+        if (status) { status.textContent = "Check the highlighted fields."; }
+        return;
+      }
+
+      var lines = [
+        "Falcons RFC training application",
+        "",
+        "Name: " + fields.name.el.value.trim() + " " + fields.surname.el.value.trim(),
+        "Email: " + fields.email.el.value.trim(),
+        "Phone: +356 " + fields.phone.el.value.replace(/\D/g, ""),
+        "Age: " + fields.age.el.value,
+        "Gender: " + fields.gender.el.value,
+        "Rugby level: " + fields.level.el.value
+      ];
+      var text = encodeURIComponent(lines.join("\n"));
+      var num = String(whatsapp || "").replace(/\D/g, "");
+      var url = num
+        ? "https://wa.me/" + num + "?text=" + text
+        : "https://wa.me/?text=" + text; // no club number configured yet: WhatsApp share picker
+
+      window.open(url, "_blank", "noopener");
+      if (status) {
+        status.innerHTML = "WhatsApp is opening with your application. Press send there to finish. " +
+          '<a href="' + url + '" target="_blank" rel="noopener">Nothing opened? Tap here.</a>';
+      }
+    });
   }
 
   /* ------------------------------------------------------------------------
@@ -1015,6 +1097,7 @@
         renderMatches(data.matches, todayISO());
         renderSponsors(data.sponsors);
         renderClub(data.teamInfo);
+        initJoinForm(data.teamInfo.whatsapp);
         initReveals();
         initCounters();
         initTilt();
@@ -1027,6 +1110,7 @@
             '<div class="matches-empty"><strong>Fixtures unavailable</strong>' +
             "Please refresh the page, or follow us on social for the latest fixtures.</div>";
         }
+        initJoinForm(null);
         initReveals();
         initCounters();
       });

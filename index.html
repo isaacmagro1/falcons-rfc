@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Falcons RFC | Rugby in Black &amp; Gold | San Pawl il-Baħar, Malta</title>
-  <meta name="description" content="Official home of Falcons RFC: Malta Rugby Championship and Prestige Cup fixtures, club partners and how to join the flock. San Pawl il-Baħar, Malta." />
+  <title>Falcons RFC | Rugby in Black &amp; Gold</title>
+  <meta name="description" content="Official home of Falcons RFC: Malta Rugby Championship and Prestige Cup fixtures, club partners and how to join the flock." />
   <meta name="theme-color" content="#0A0A0B" />
 
   <!-- Open Graph -->
   <meta property="og:title" content="Falcons RFC | Rugby in Black &amp; Gold" />
-  <meta property="og:description" content="Season 2026/27 fixtures, club partners and the story of the flock. San Pawl il-Baħar, Malta." />
+  <meta property="og:description" content="Season 2026/27 fixtures, club partners and the story of the flock." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://isaacmagro1.github.io/falcons-rfc/" />
   <meta property="og:image" content="https://isaacmagro1.github.io/falcons-rfc/assets/img/falcons-logo.png" />
@@ -33,12 +33,6 @@
 
   <!-- ============ HEADER / NAV ============ -->
   <header class="site-header" id="top">
-    <div class="topbar" aria-hidden="true">
-      <div class="container topbar__inner">
-        <span>San Pawl il-Baħar &bull; Malta</span>
-        <span>Season 2026/27</span>
-      </div>
-    </div>
     <nav class="site-nav container" aria-label="Primary">
       <a class="nav-brand" href="#top">
         <img src="assets/img/falcons-mark.png" alt="" width="44" height="25" />
@@ -49,7 +43,7 @@
         <li><a href="#sponsors">Partners</a></li>
         <li><a href="#club">The Club</a></li>
       </ul>
-      <a class="btn btn--gold nav-cta" href="#club">Join the flock</a>
+      <a class="btn btn--gold nav-cta" href="#join">Join the flock</a>
       <button class="nav-burger" id="nav-burger" type="button"
               aria-expanded="false" aria-controls="menu-overlay" aria-label="Open menu">
         <span></span><span></span>
@@ -67,8 +61,7 @@
       </ul>
     </nav>
     <div class="menu-overlay__foot" style="--i:3">
-      <a class="btn btn--gold" href="#club">Join the flock</a>
-      <p>San Pawl il-Baħar &bull; Malta</p>
+      <a class="btn btn--gold" href="#join">Join the flock</a>
     </div>
   </div>
 
@@ -89,7 +82,7 @@
           <span class="hero__mask"><span class="hero__line hero__line--outline">Rugby in</span></span>
           <span class="hero__mask"><span class="hero__line">Black <em class="amp">&amp;</em> <em class="gold">Gold</em></span></span>
         </h1>
-        <p class="hero__tagline">Malta Rugby Championship and Prestige Cup rugby from San Pawl il-Baħar.</p>
+        <p class="hero__tagline">Malta Rugby Championship and Prestige Cup rugby. Men&rsquo;s, women&rsquo;s and youth teams.</p>
         <div class="hero__actions">
           <a class="btn btn--gold" href="#matches">Season 2026/27 fixtures</a>
           <a class="btn btn--ghost" href="#club">Inside the club</a>
@@ -104,11 +97,11 @@
     <div class="marquee hero__marquee" aria-hidden="true">
       <div class="marquee__track">
         <span>Falcons RFC</span><i></i><span>Black &amp; Gold</span><i></i>
-        <span>San Pawl il-Baħar</span><i></i><span>Malta Rugby Championship</span><i></i>
-        <span>Prestige Cup</span><i></i><span>Up the Falcons</span><i></i>
+        <span>Malta Rugby Championship</span><i></i><span>Prestige Cup</span><i></i>
+        <span>Up the Falcons</span><i></i>
         <span>Falcons RFC</span><i></i><span>Black &amp; Gold</span><i></i>
-        <span>San Pawl il-Baħar</span><i></i><span>Malta Rugby Championship</span><i></i>
-        <span>Prestige Cup</span><i></i><span>Up the Falcons</span><i></i>
+        <span>Malta Rugby Championship</span><i></i><span>Prestige Cup</span><i></i>
+        <span>Up the Falcons</span><i></i>
       </div>
     </div>
   </section>
@@ -243,6 +236,91 @@
         <a class="btn btn--dark reveal" href="#matches">See the fixture list</a>
       </div>
     </aside>
+
+    <!-- ============ JOIN — training application ============ -->
+    <section class="section section--join" id="join" aria-labelledby="join-title">
+      <div class="container join-grid">
+        <div class="join-copy">
+          <header class="section-head">
+            <h2 class="section-head__title" id="join-title">
+              <span class="t-line"><span>Train with<br />the flock</span></span>
+            </h2>
+            <p class="section-head__sub">Men&rsquo;s, women&rsquo;s and youth rugby, every level welcome. Register your interest and your application goes straight to the club on WhatsApp.</p>
+          </header>
+          <ul class="join-points">
+            <li>No experience needed. Plenty of Falcons started from zero.</li>
+            <li>Tell us your level and the coaches take it from there.</li>
+            <li>You send the final WhatsApp message yourself, so nothing is shared until you press send.</li>
+          </ul>
+        </div>
+
+        <form class="join-form reveal" id="join-form" novalidate>
+          <div class="join-form__row">
+            <div class="field">
+              <label for="jf-name">Name</label>
+              <input id="jf-name" name="name" type="text" autocomplete="given-name" required />
+              <p class="field__error" id="jf-name-error" hidden>Enter your name.</p>
+            </div>
+            <div class="field">
+              <label for="jf-surname">Surname</label>
+              <input id="jf-surname" name="surname" type="text" autocomplete="family-name" required />
+              <p class="field__error" id="jf-surname-error" hidden>Enter your surname.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="jf-email">Email</label>
+            <input id="jf-email" name="email" type="email" autocomplete="email" inputmode="email" required />
+            <p class="field__error" id="jf-email-error" hidden>Enter a valid email address.</p>
+          </div>
+
+          <div class="join-form__row">
+            <div class="field">
+              <label for="jf-phone">Phone</label>
+              <div class="phone-wrap">
+                <span class="phone-prefix" aria-hidden="true">+356</span>
+                <input id="jf-phone" name="phone" type="tel" autocomplete="tel-national" inputmode="numeric" placeholder="7912 3456" required aria-describedby="jf-phone-hint" />
+              </div>
+              <p class="field__hint" id="jf-phone-hint">Malta number, 8 digits.</p>
+              <p class="field__error" id="jf-phone-error" hidden>Enter an 8-digit Malta number.</p>
+            </div>
+            <div class="field">
+              <label for="jf-age">Age</label>
+              <input id="jf-age" name="age" type="number" inputmode="numeric" min="5" max="99" required />
+              <p class="field__error" id="jf-age-error" hidden>Enter an age between 5 and 99.</p>
+            </div>
+          </div>
+
+          <div class="join-form__row">
+            <div class="field">
+              <label for="jf-gender">Gender</label>
+              <select id="jf-gender" name="gender" required>
+                <option value="" selected disabled>Select</option>
+                <option>Female</option>
+                <option>Male</option>
+                <option>Prefer not to say</option>
+              </select>
+              <p class="field__error" id="jf-gender-error" hidden>Pick an option.</p>
+            </div>
+            <div class="field">
+              <label for="jf-level">Rugby level</label>
+              <select id="jf-level" name="level" required>
+                <option value="" selected disabled>Select</option>
+                <option>New to rugby</option>
+                <option>Beginner, played a little</option>
+                <option>Club experience</option>
+                <option>Experienced player</option>
+              </select>
+              <p class="field__error" id="jf-level-error" hidden>Pick your level.</p>
+            </div>
+          </div>
+
+          <button class="btn btn--gold join-form__submit" type="submit">Send via WhatsApp</button>
+          <p class="join-form__note">Submitting opens WhatsApp with your application written out and ready. Press send there to finish.</p>
+          <p class="join-form__status" id="join-status" role="status"></p>
+        </form>
+      </div>
+    </section>
   </main>
 
   <!-- ============ FOOTER ============ -->
@@ -254,7 +332,7 @@
     <div class="container footer-grid">
       <div class="footer-brand">
         <p class="footer-brand__name">Falcons RFC</p>
-        <p class="footer-brand__line">Rugby in black &amp; gold.<br />San Pawl il-Baħar, Malta.</p>
+        <p class="footer-brand__line">Rugby in black &amp; gold.</p>
       </div>
       <nav class="footer-col" aria-label="Footer">
         <h3>Explore</h3>
@@ -264,13 +342,6 @@
           <li><a href="#club">The Club</a></li>
         </ul>
       </nav>
-      <div class="footer-col">
-        <h3>Competitions</h3>
-        <ul>
-          <li>Malta Rugby Championship</li>
-          <li>Prestige Cup</li>
-        </ul>
-      </div>
       <div class="footer-col" id="footer-social">
         <h3>Follow the Flock</h3>
         <ul>
@@ -280,8 +351,7 @@
     </div>
     <div class="footer-legal">
       <div class="container footer-legal__inner">
-        <p>&copy; <span id="footer-year">2026</span> Falcons RFC. All rights reserved.</p>
-        <p>Marsa Rugby Football Pitch &bull; New Hibs Ground</p>
+        <p>&copy; <span id="footer-year">2026</span> Falcons RFC. All rights reserved. <span class="footer-legal__sep" aria-hidden="true">|</span> Website by <a href="https://www.novummarketing.co/" target="_blank" rel="noopener">Novum Agency</a></p>
       </div>
     </div>
   </footer>
@@ -298,7 +368,7 @@
     When served over HTTP the JSON files are the source of truth.
   -->
   <script type="application/json" id="fallback-data">
-  {"matches":{"season":"2026/27","note":"Kick-off times are announced by the Malta Rugby Football Union closer to each matchday.","matches":[{"id":"mrc-md1","competition":"Malta Rugby Championship","round":"Matchday 1","date":"2026-10-10","time":null,"opponent":"Wolves","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md3","competition":"Malta Rugby Championship","round":"Matchday 3","date":"2026-10-24","time":null,"opponent":"Overseas","venue":"New Hibs Ground","home":false},{"id":"mrc-md4","competition":"Malta Rugby Championship","round":"Matchday 4","date":"2026-11-21","time":null,"opponent":"Stompers","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md5","competition":"Malta Rugby Championship","round":"Matchday 5","date":"2026-11-28","time":null,"opponent":"Kavallieri","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md6","competition":"Malta Rugby Championship","round":"Matchday 6","date":"2026-12-05","time":null,"opponent":"Wolves","venue":"New Hibs Ground","home":false},{"id":"mrc-md8","competition":"Malta Rugby Championship","round":"Matchday 8","date":"2027-01-09","time":null,"opponent":"Overseas","venue":null,"home":null},{"id":"mrc-md9","competition":"Malta Rugby Championship","round":"Matchday 9","date":"2027-01-16","time":null,"opponent":"Stompers","venue":"New Hibs Ground","home":false},{"id":"mrc-md10","competition":"Malta Rugby Championship","round":"Matchday 10","date":"2027-01-23","time":null,"opponent":"Kavallieri","venue":null,"home":null},{"id":"mrc-md11","competition":"Malta Rugby Championship","round":"Matchday 11","date":"2027-01-30","time":null,"opponent":"Wolves","venue":"New Hibs Ground","home":false},{"id":"mrc-md13","competition":"Malta Rugby Championship","round":"Matchday 13","date":"2027-03-06","time":null,"opponent":"Overseas","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md14","competition":"Malta Rugby Championship","round":"Matchday 14","date":"2027-03-13","time":null,"opponent":"Stompers","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md15","competition":"Malta Rugby Championship","round":"Matchday 15","date":"2027-03-20","time":null,"opponent":"Kavallieri","venue":"Marsa Rugby Football Pitch","home":true},{"id":"cup-sf","competition":"Prestige Cup","round":"Semi-final","date":"2027-04-10","time":null,"opponent":"Kavallieri","venue":null,"home":true},{"id":"cup-final","competition":"Prestige Cup","round":"Final","date":"2027-04-24","time":null,"opponent":null,"venue":null,"note":"Finalists decided by the semi-finals","home":null}]},"sponsors":{"note":"Sponsor roster from the Falcons RFC branding guide, season 2026. Drop a logo file into assets/img/sponsors/ and set its path in \"logo\" to replace the monogram tile.","sponsors":[{"name":"Cisk Pilsner","tier":"main","tagline":"Season 2026/27","logo":null,"website":null},{"name":"Deefort","tier":"partner","tagline":"Official Kit Partner","logo":null,"website":null},{"name":"The San Paolo","tier":"partner","tagline":"San Pawl il-Baħar","logo":null,"website":null},{"name":"Dalton Reefer's Ltd","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Portughes","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Prestige","tier":"partner","tagline":"Prestige Cup Partner","logo":null,"website":null},{"name":"Lemon Soda","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Martina's","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Heels & Keys","tier":"partner","tagline":"Key Cutting & Shoe Repair","logo":null,"website":null}]},"teamInfo":{"name":"Falcons RFC","shortName":"Falcons","location":"San Pawl il-Baħar, Malta","colors":"Black & Gold","league":"Malta Rugby Championship","cup":"Prestige Cup","grounds":["Marsa Rugby Football Pitch","New Hibs Ground"],"about":["With more than two decades of rugby behind us, Falcons RFC is one of Malta's five senior clubs, competing at the top of the Maltese game in the Malta Rugby Championship and the Prestige Cup. We wear black and gold with intent: every triangle on the jersey is a nod to the flock behind us.","The Falcons have grown into a family club, fielding men's, women's and youth teams. Our women's side was one of the first women's rugby teams in Malta. From Marsa to New Hibs, matchday brings players, supporters, sponsors and volunteers together. Whether you have played all your life or never touched a rugby ball, there is a place for you in the flock."],"honours":[{"title":"Mediterranean Bank Cup","detail":"2nd Division winners, 2013/14 & 2014/15"},{"title":"Women's 7s & 10s Champions","detail":"Both tournament titles, 2013/14 season"},{"title":"Player of the Year","detail":"Kyle Gauci, Malta Rugby Championship"},{"title":"Top Scorer of the Year","detail":"Brendan Dalton, Malta Rugby Championship"}],"social":[{"platform":"Instagram","handle":"@falconsmalta","url":"https://instagram.com/falconsmalta"},{"platform":"Facebook","handle":"Falcons RFC","url":"https://facebook.com/FalconsRFC"}]}}
+  {"matches":{"season":"2026/27","note":"Kick-off times are announced by the Malta Rugby Football Union closer to each matchday.","matches":[{"id":"mrc-md1","competition":"Malta Rugby Championship","round":"Matchday 1","date":"2026-10-10","time":null,"opponent":"Wolves","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md3","competition":"Malta Rugby Championship","round":"Matchday 3","date":"2026-10-24","time":null,"opponent":"Overseas","venue":"New Hibs Ground","home":false},{"id":"mrc-md4","competition":"Malta Rugby Championship","round":"Matchday 4","date":"2026-11-21","time":null,"opponent":"Stompers","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md5","competition":"Malta Rugby Championship","round":"Matchday 5","date":"2026-11-28","time":null,"opponent":"Kavallieri","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md6","competition":"Malta Rugby Championship","round":"Matchday 6","date":"2026-12-05","time":null,"opponent":"Wolves","venue":"New Hibs Ground","home":false},{"id":"mrc-md8","competition":"Malta Rugby Championship","round":"Matchday 8","date":"2027-01-09","time":null,"opponent":"Overseas","venue":null,"home":null},{"id":"mrc-md9","competition":"Malta Rugby Championship","round":"Matchday 9","date":"2027-01-16","time":null,"opponent":"Stompers","venue":"New Hibs Ground","home":false},{"id":"mrc-md10","competition":"Malta Rugby Championship","round":"Matchday 10","date":"2027-01-23","time":null,"opponent":"Kavallieri","venue":null,"home":null},{"id":"mrc-md11","competition":"Malta Rugby Championship","round":"Matchday 11","date":"2027-01-30","time":null,"opponent":"Wolves","venue":"New Hibs Ground","home":false},{"id":"mrc-md13","competition":"Malta Rugby Championship","round":"Matchday 13","date":"2027-03-06","time":null,"opponent":"Overseas","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md14","competition":"Malta Rugby Championship","round":"Matchday 14","date":"2027-03-13","time":null,"opponent":"Stompers","venue":"Marsa Rugby Football Pitch","home":true},{"id":"mrc-md15","competition":"Malta Rugby Championship","round":"Matchday 15","date":"2027-03-20","time":null,"opponent":"Kavallieri","venue":"Marsa Rugby Football Pitch","home":true},{"id":"cup-sf","competition":"Prestige Cup","round":"Semi-final","date":"2027-04-10","time":null,"opponent":"Kavallieri","venue":null,"home":true},{"id":"cup-final","competition":"Prestige Cup","round":"Final","date":"2027-04-24","time":null,"opponent":null,"venue":null,"note":"Finalists decided by the semi-finals","home":null}]},"sponsors":{"note":"Sponsor roster from the Falcons RFC branding guide, season 2026. Drop a logo file into assets/img/sponsors/ and set its path in \"logo\" to replace the monogram tile.","sponsors":[{"name":"Cisk Pilsner","tier":"main","tagline":"Season 2026/27","logo":null,"website":null},{"name":"Deefort","tier":"partner","tagline":"Official Kit Partner","logo":null,"website":null},{"name":"The San Paolo","tier":"partner","tagline":"San Pawl il-Baħar","logo":null,"website":null},{"name":"Dalton Reefer's Ltd","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Portughes","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Prestige","tier":"partner","tagline":"Prestige Cup Partner","logo":null,"website":null},{"name":"Lemon Soda","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Martina's","tier":"partner","tagline":null,"logo":null,"website":null},{"name":"Heels & Keys","tier":"partner","tagline":"Key Cutting & Shoe Repair","logo":null,"website":null}]},"teamInfo":{"name":"Falcons RFC","shortName":"Falcons","location":"San Pawl il-Baħar, Malta","colors":"Black & Gold","league":"Malta Rugby Championship","cup":"Prestige Cup","grounds":["Marsa Rugby Football Pitch","New Hibs Ground"],"about":["With more than two decades of rugby behind us, Falcons RFC is one of Malta's five senior clubs, competing at the top of the Maltese game in the Malta Rugby Championship and the Prestige Cup. We wear black and gold with intent: every triangle on the jersey is a nod to the flock behind us.","The Falcons have grown into a family club, fielding men's, women's and youth teams. Our women's side was one of the first women's rugby teams in Malta. From Marsa to New Hibs, matchday brings players, supporters, sponsors and volunteers together. Whether you have played all your life or never touched a rugby ball, there is a place for you in the flock."],"honours":[{"title":"Mediterranean Bank Cup","detail":"2nd Division winners, 2013/14 & 2014/15"},{"title":"Women's 7s & 10s Champions","detail":"Both tournament titles, 2013/14 season"},{"title":"Player of the Year","detail":"Kyle Gauci, Malta Rugby Championship"},{"title":"Top Scorer of the Year","detail":"Brendan Dalton, Malta Rugby Championship"}],"social":[{"platform":"Instagram","handle":"@falconsmalta","url":"https://instagram.com/falconsmalta"},{"platform":"Facebook","handle":"Falcons RFC","url":"https://facebook.com/FalconsRFC"}],"whatsapp":null}}
   </script>
 
   <script src="js/script.js" defer></script>
