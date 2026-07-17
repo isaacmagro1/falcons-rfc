@@ -9,6 +9,9 @@
       "won": 0,
       "drawn": 0,
       "lost": 0,
+      "pf": 0,
+      "pa": 0,
+      "bp": 0,
       "points": 0
     },
     {
@@ -17,6 +20,9 @@
       "won": 0,
       "drawn": 0,
       "lost": 0,
+      "pf": 0,
+      "pa": 0,
+      "bp": 0,
       "points": 0
     },
     {
@@ -25,6 +31,9 @@
       "won": 0,
       "drawn": 0,
       "lost": 0,
+      "pf": 0,
+      "pa": 0,
+      "bp": 0,
       "points": 0
     },
     {
@@ -33,6 +42,9 @@
       "won": 0,
       "drawn": 0,
       "lost": 0,
+      "pf": 0,
+      "pa": 0,
+      "bp": 0,
       "points": 0
     },
     {
@@ -41,6 +53,9 @@
       "won": 0,
       "drawn": 0,
       "lost": 0,
+      "pf": 0,
+      "pa": 0,
+      "bp": 0,
       "points": 0
     }
   ]

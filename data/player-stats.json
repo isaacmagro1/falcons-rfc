@@ -2,5 +2,6 @@
   "season": "2026/27",
   "updated": null,
   "note": "Stats update through the season. Zeros until the league kicks off on 10 October.",
-  "players": []
+  "players": [],
+  "fields": "Per player: name (exactly as in squad.json), games, minutes, tries, conversions, yellow, red. Points = tries x 5 + conversions x 2, computed automatically."
 }

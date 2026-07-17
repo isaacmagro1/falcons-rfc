@@ -611,12 +611,16 @@
     if (!host || !data || !Array.isArray(data.table)) { return; }
 
     var rows = data.table.slice().sort(function (a, b) {
-      return (b.points - a.points) ||
-             ((b.won || 0) - (a.won || 0)) ||
+      var pdA = (a.pf || 0) - (a.pa || 0);
+      var pdB = (b.pf || 0) - (b.pa || 0);
+      return ((b.points || 0) - (a.points || 0)) ||
+             (pdB - pdA) ||
+             ((b.pf || 0) - (a.pf || 0)) ||
              String(a.team).localeCompare(String(b.team));
     });
 
     var body = rows.map(function (r, i) {
+      var pd = (r.pf || 0) - (r.pa || 0);
       var isFalcons = String(r.team).toLowerCase() === "falcons";
       return (
         "<tr" + (isFalcons ? ' class="is-falcons"' : "") + ">" +
@@ -624,9 +628,13 @@
           '<td class="standings__club"><img src="' + esc(opponentLogoPath(r.team)) + '" alt="" loading="lazy" ' +
             'onerror="this.remove()" /><span>' + esc(r.team) + "</span></td>" +
           '<td class="standings__num">' + (r.played || 0) + "</td>" +
-          '<td class="standings__num standings__wdl">' + (r.won || 0) + "</td>" +
-          '<td class="standings__num standings__wdl">' + (r.drawn || 0) + "</td>" +
-          '<td class="standings__num standings__wdl">' + (r.lost || 0) + "</td>" +
+          '<td class="standings__num">' + (r.won || 0) + "</td>" +
+          '<td class="standings__num col-d">' + (r.drawn || 0) + "</td>" +
+          '<td class="standings__num">' + (r.lost || 0) + "</td>" +
+          '<td class="standings__num col-pf">' + (r.pf || 0) + "</td>" +
+          '<td class="standings__num col-pa">' + (r.pa || 0) + "</td>" +
+          '<td class="standings__num col-pd">' + (pd > 0 ? "+" + pd : pd) + "</td>" +
+          '<td class="standings__num col-bp">' + (r.bp || 0) + "</td>" +
           '<td class="standings__num standings__pts">' + (r.points || 0) + "</td>" +
         "</tr>"
       );
@@ -637,11 +645,15 @@
         "<thead><tr>" +
           '<th scope="col"><span class="visually-hidden">Position</span>#</th>' +
           '<th scope="col" class="standings__club-h">Club</th>' +
-          '<th scope="col">P</th>' +
-          '<th scope="col" class="standings__wdl">W</th>' +
-          '<th scope="col" class="standings__wdl">D</th>' +
-          '<th scope="col" class="standings__wdl">L</th>' +
-          '<th scope="col">Pts</th>' +
+          '<th scope="col" title="Played">P</th>' +
+          '<th scope="col" title="Won">W</th>' +
+          '<th scope="col" title="Drawn" class="col-d">D</th>' +
+          '<th scope="col" title="Lost">L</th>' +
+          '<th scope="col" title="Points for" class="col-pf">PF</th>' +
+          '<th scope="col" title="Points against" class="col-pa">PA</th>' +
+          '<th scope="col" title="Points difference" class="col-pd">PD</th>' +
+          '<th scope="col" title="Bonus points" class="col-bp">BP</th>' +
+          '<th scope="col" title="League points">PNTS</th>' +
         "</tr></thead><tbody>" + body + "</tbody></table>" +
       (data.note ? '<p class="standings__note">' + esc(data.note) + "</p>" : "");
   }
@@ -649,7 +661,8 @@
   /**
    * Full squad stats table. Every squad member renders immediately (zeros
    * pre-season); values come from data/player-stats.json keyed by the exact
-   * player name, and the table re-sorts itself as stats land.
+   * player name. Points = tries x 5 + conversions x 2, computed here so the
+   * data file only ever records raw counts.
    */
   function renderPlayers(data, squad) {
     var host = document.getElementById("players-boards");
@@ -668,9 +681,11 @@
           rows.push({
             name: name,
             position: pos.position,
-            tries: s.tries || 0,
-            points: s.points || 0,
-            minutes: s.minutes || 0
+            games: s.games || 0,
+            minutes: s.minutes || 0,
+            points: (s.tries || 0) * 5 + (s.conversions || 0) * 2,
+            yellow: s.yellow || 0,
+            red: s.red || 0
           });
         });
       });
@@ -678,8 +693,8 @@
     if (!rows.length) { return; }
 
     rows.sort(function (a, b) {
-      return (b.points - a.points) || (b.tries - a.tries) ||
-             (b.minutes - a.minutes) || a.name.localeCompare(b.name);
+      return (b.points - a.points) || (b.minutes - a.minutes) ||
+             (b.games - a.games) || a.name.localeCompare(b.name);
     });
 
     var body = rows.map(function (r, i) {
@@ -688,9 +703,11 @@
           '<td class="standings__pos">' + (i + 1) + "</td>" +
           '<td class="ptable__player"><span class="ptable__name">' + esc(r.name) + "</span>" +
             '<span class="ptable__position">' + esc(r.position) + "</span></td>" +
-          '<td class="standings__num">' + r.tries + "</td>" +
-          '<td class="standings__num">' + r.points + "</td>" +
-          '<td class="standings__num standings__pts">' + r.minutes + "</td>" +
+          '<td class="standings__num">' + r.games + "</td>" +
+          '<td class="standings__num col-min">' + r.minutes + "</td>" +
+          '<td class="standings__num standings__pts">' + r.points + "</td>" +
+          '<td class="standings__num ptable__yc">' + r.yellow + "</td>" +
+          '<td class="standings__num ptable__rc">' + r.red + "</td>" +
         "</tr>"
       );
     }).join("");
@@ -700,9 +717,11 @@
         "<thead><tr>" +
           '<th scope="col"><span class="visually-hidden">Rank</span>#</th>' +
           '<th scope="col" class="standings__club-h">Player</th>' +
-          '<th scope="col" title="Tries">T</th>' +
-          '<th scope="col" title="Points">Pts</th>' +
-          '<th scope="col" title="Minutes played">Min</th>' +
+          '<th scope="col" title="Games played">P</th>' +
+          '<th scope="col" title="Minutes played" class="col-min">Min</th>' +
+          '<th scope="col" title="Points from tries and conversions">Pts</th>' +
+          '<th scope="col" title="Yellow cards">YC</th>' +
+          '<th scope="col" title="Red cards">RC</th>' +
         "</tr></thead><tbody>" + body + "</tbody></table>" +
       ((data && data.note) ? '<p class="standings__note">' + esc(data.note) + "</p>" : "");
   }

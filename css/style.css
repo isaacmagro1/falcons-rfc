@@ -1275,7 +1275,7 @@ button {
   border-collapse: collapse;
 }
 .standings__table th {
-  padding: 0.625rem 0.75rem;
+  padding: 0.625rem 0.5rem;
   font-weight: 700;
   font-size: 0.6875rem;
   letter-spacing: 0.18em;
@@ -1288,7 +1288,7 @@ button {
   text-align: left;
 }
 .standings__table td {
-  padding: 0.875rem 0.75rem;
+  padding: 0.875rem 0.5rem;
   border-bottom: 1px solid var(--line);
   font-size: 0.9375rem;
   color: var(--text-muted);
@@ -1320,7 +1320,7 @@ button {
   vertical-align: middle;
 }
 .standings__num {
-  width: 3rem;
+  width: 2.6rem;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
@@ -1329,6 +1329,9 @@ button {
   font-size: 1.25rem;
   color: var(--text);
 }
+.ptable__yc { color: var(--gold); }
+.ptable__rc { color: #E0766A; }
+
 .standings__table tr.is-falcons {
   background: rgba(253, 185, 21, 0.07);
 }
@@ -1343,9 +1346,15 @@ button {
   font-size: 0.875rem;
   color: var(--text-faint);
 }
+/* Narrow screens shed detail columns in tiers; the wrapper still
+   scrolls sideways as a last resort */
+@media (max-width: 900px) {
+  .col-pf, .col-pa { display: none; }
+}
 @media (max-width: 560px) {
-  .standings__wdl { display: none; }
+  .col-d, .col-bp, .col-min { display: none; }
   .standings__club { min-width: 0; }
+  .ptable__player { min-width: 8.5rem; }
 }
 
 /* --------------------------------------------------------------------------
