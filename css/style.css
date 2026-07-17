@@ -303,21 +303,6 @@ button {
   }
 }
 
-/* Reading progress bar */
-.progress {
-  position: fixed;
-  inset: 0 0 auto 0;
-  height: 3px;
-  z-index: 300;
-  pointer-events: none;
-}
-.progress span {
-  display: block;
-  height: 100%;
-  background: var(--gold);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-}
 
 /* --------------------------------------------------------------------------
    4. BUTTONS
@@ -1597,33 +1582,6 @@ button {
   color: var(--text);
 }
 
-/* Facts — hairline ledger rows, not boxes */
-.club-facts {
-  margin-block: var(--s-4);
-  border-top: 1px solid var(--line);
-}
-.club-fact {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--s-2);
-  padding-block: var(--s-2);
-  border-bottom: 1px solid var(--line);
-}
-.club-fact dt {
-  font-weight: 700;
-  font-size: 0.6875rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-.club-fact dd {
-  font-family: var(--font-display);
-  font-size: 1.125rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  text-align: right;
-}
 
 .club-social {
   display: flex;
@@ -2149,16 +2107,12 @@ button {
   margin-inline: 0.375rem;
   color: var(--text-faint);
 }
-.footer-novum {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  vertical-align: bottom;
+/* Each legal half stays intact; narrow screens wrap between them */
+.footer-legal__part {
+  white-space: nowrap;
 }
-.footer-novum img {
-  width: 15px;
-  height: auto;
-  opacity: 0.85;
+@media (max-width: 560px) {
+  .footer-legal__sep { display: none; }
 }
 
 .noscript-note {

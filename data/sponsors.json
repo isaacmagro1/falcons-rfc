@@ -63,6 +63,13 @@
       "tagline": "Key Cutting & Shoe Repair",
       "logo": "assets/img/sponsors/heels-keys.png",
       "website": null
+    },
+    {
+      "name": "Novum",
+      "tier": "partner",
+      "tagline": null,
+      "logo": "assets/img/sponsors/novum.png",
+      "website": "https://www.novummarketing.co/"
     }
   ]
 }

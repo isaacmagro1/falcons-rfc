@@ -575,18 +575,6 @@
       }).join("");
     }
 
-    var facts = document.getElementById("club-facts");
-    if (facts) {
-      var rows = [
-        ["Colours", info.colors],
-        ["League", info.league],
-        ["Cup", info.cup]
-      ].filter(function (r) { return r[1]; });
-      facts.innerHTML = rows.map(function (r) {
-        return '<div class="club-fact reveal"><dt>' + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>";
-      }).join("");
-    }
-
     var social = document.getElementById("club-social");
     if (social && Array.isArray(info.social)) {
       social.innerHTML = info.social.map(socialLinkHTML).join("");
@@ -1048,7 +1036,6 @@
       the progress bar and the parallax layers. */
   function initScrollLoop() {
     var header = document.querySelector(".site-header");
-    var bar = document.getElementById("progress-bar");
     var watermark = REDUCED_MOTION ? null : document.getElementById("hero-watermark");
     var layers = REDUCED_MOTION ? [] :
       Array.prototype.slice.call(document.querySelectorAll("[data-parallax]"));
@@ -1060,10 +1047,6 @@
 
       if (header) { header.classList.toggle("is-scrolled", y > 24); }
 
-      if (bar) {
-        var max = document.documentElement.scrollHeight - window.innerHeight;
-        bar.style.transform = "scaleX(" + (max > 0 ? Math.min(y / max, 1) : 0) + ")";
-      }
 
       // Kinetic wordmark: drifts left as you leave the hero
       if (watermark && y < window.innerHeight * 1.5) {
