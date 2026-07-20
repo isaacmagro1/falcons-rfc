@@ -802,8 +802,14 @@
       index = ((i % count) + count) % count;
       thumbs.forEach(function (t, ti) { t.classList.toggle("is-active", ti === index); });
       var active = thumbs[index];
-      if (active && active.scrollIntoView) {
-        active.scrollIntoView({ behavior: REDUCED_MOTION ? "auto" : "smooth", inline: "center", block: "nearest" });
+      if (active) {
+        // Scroll only the strip's own horizontal axis (Element.scrollTo on
+        // the strip itself) — never scrollIntoView here, which scrolls the
+        // whole page vertically too if the strip isn't already in view
+        // (exactly what happened on page load: it dragged the entire page
+        // down to the gallery just to reveal the first thumbnail).
+        var target = active.offsetLeft - (strip.clientWidth - active.clientWidth) / 2;
+        strip.scrollTo({ left: target, behavior: REDUCED_MOTION ? "auto" : "smooth" });
       }
     }
 
