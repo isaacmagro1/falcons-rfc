@@ -70,6 +70,20 @@
       "tagline": null,
       "logo": "assets/img/sponsors/novum.png",
       "website": "https://www.novummarketing.co/"
+    },
+    {
+      "name": "Adura",
+      "tier": "partner",
+      "tagline": null,
+      "logo": "assets/img/sponsors/adura.png",
+      "website": null
+    },
+    {
+      "name": "Training Room",
+      "tier": "partner",
+      "tagline": null,
+      "logo": "assets/img/sponsors/training-room.png",
+      "website": null
     }
   ]
 }
