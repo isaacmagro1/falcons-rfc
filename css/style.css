@@ -443,17 +443,23 @@ button {
   font-size: 0.8125rem;
 }
 
-/* Burger — mobile only */
+/* Burger — mobile only. Own translucent chip (not transparent) so it stays
+   legible against any hero backdrop — photo, canvas or gold — since the
+   header itself has no background until the page is scrolled. */
 .nav-burger {
   display: none;
   position: relative;
   width: 2.75rem;
   height: 2.75rem;
-  background: transparent;
-  border: 1px solid var(--line);
+  background: rgba(10, 10, 11, 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(244, 241, 233, 0.3);
+  box-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.65);
   cursor: pointer;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  transition: transform var(--t-press) var(--ease-out), border-color var(--t-fast) ease;
+  transition: transform var(--t-press) var(--ease-out), border-color var(--t-fast) ease,
+              background-color var(--t-fast) ease;
 }
 .nav-burger:active {
   transform: scale(0.94);
