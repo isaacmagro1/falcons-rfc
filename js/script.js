@@ -1333,6 +1333,28 @@
     });
   }
 
+  /**
+   * Cross-page links to an anchor (e.g. "index.html#sponsors") land on a
+   * fresh page load. The browser's one-time scroll-to-fragment fires
+   * before the async-rendered content above the target (fixture rail,
+   * standings table, sponsor spotlight...) has expanded the page, so it
+   * settles short — landing on whatever section the fragment used to be
+   * level with. Re-run the jump once rendering has actually finished.
+   */
+  function fixHashScroll() {
+    var hash = window.location.hash;
+    if (!hash || hash.length < 2) { return; }
+    var target;
+    try { target = document.getElementById(decodeURIComponent(hash.slice(1))); }
+    catch (e) { target = null; }
+    if (!target) { return; }
+    var root = document.documentElement;
+    var prevBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto"; // snap once; no second glide on top of the browser's own jump
+    target.scrollIntoView({ block: "start" });
+    root.style.scrollBehavior = prevBehavior;
+  }
+
   /* ------------------------------------------------------------------------
      BOOT
      ------------------------------------------------------------------------ */
@@ -1358,6 +1380,7 @@
         initReveals();
         initCounters();
         initTilt();
+        fixHashScroll();
       })
       .catch(function (err) {
         console.error("Falcons RFC: could not load site data.", err);
@@ -1370,6 +1393,7 @@
         initJoinForm(null);
         initReveals();
         initCounters();
+        fixHashScroll();
       });
   });
 })();

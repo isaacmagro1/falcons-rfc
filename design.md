@@ -87,7 +87,9 @@ three-card rows.
 - Three pages share `css/style.css` and `js/script.js`: `index.html` (fixtures,
   standings, sponsors, join), `team.html` (squad + player standings) and
   `about.html` (club history + honours). Nav order everywhere: Fixtures ·
-  Standings · Team · Partners · About.
+  About · Team · Partners. Standings has no nav entry (it is still on the
+  homepage, just not linked) since a fourth top-level item did not earn
+  its place; reach it via the Fixtures section.
 
 | Region         | Mobile              | ≥768px             | ≥1024px                  |
 | -------------- | ------------------- | ------------------ | ------------------------ |
