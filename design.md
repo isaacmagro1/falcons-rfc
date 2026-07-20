@@ -189,8 +189,22 @@ The first copy is the real one; clones are `aria-hidden` with untabbable links.
 - **History** (`.history`): the club's story from founding (2005) to today,
   segmented into year-tagged blocks (gold Anton year + heading + prose,
   `140px` label column ≥768px) so a photo can slot beside any era later
-  without restructuring. Closes with an undated thank-you block, set apart
-  by a gold-tinted rule.
+  without restructuring. Closes with an honest bridge line (the record
+  currently runs to 2011; 2012-2026 is still to be added) and a short
+  thank-you, set apart by a gold-tinted rule.
+- **Gallery** (`.gallery`, `#gallery`): real club photos from
+  `assets/img/about/gallery/`, not stock. A scroll-snap stage (mouse drag
+  reuses the fixture-rail pattern, touch scrolls natively, arrow buttons
+  wrap around) paired with a filmstrip whose active thumbnail widens
+  (`2.75rem` to `5.5rem`) and auto-centres itself; the strip itself is
+  centred under the stage from `768px` up (left-aligned + scrollable
+  below that, since it can overflow on narrow screens). No per-photo
+  captions: several archive shots have no confirmed date or event, so
+  the images speak for themselves rather than risk a caption that
+  doesn't match. Image list lives in `js/script.js`
+  (`GALLERY_IMAGES`), about.html-only (every function no-ops if
+  `#gallery-root` is absent, same pattern as every other page-specific
+  renderer).
 - **The Club today**: about copy (short lead sentence from
   `data/team-info.json`, rendered brighter than the rest), social buttons,
   the jersey photo (clip-path wipe reveal) and honours as a **numbered

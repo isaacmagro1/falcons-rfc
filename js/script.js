@@ -755,6 +755,112 @@
   }
 
   /* ------------------------------------------------------------------------
+     5d. GALLERY — through the years (about.html only; no-ops elsewhere).
+     A scroll-snap stage (drag with the mouse, swipe on touch, or use the
+     arrows) paired with a filmstrip whose active thumbnail widens. Real
+     club photos, so captions only state what is plainly visible.
+     ------------------------------------------------------------------------ */
+
+  var GALLERY_IMAGES = [
+    { src: "assets/img/about/gallery/gallery-01.jpg", alt: "Falcons RFC archive photo" },
+    { src: "assets/img/about/gallery/gallery-02.jpg", alt: "Falcons RFC archive photo" },
+    { src: "assets/img/about/gallery/gallery-03.jpg", alt: "Falcons RFC archive photo" },
+    { src: "assets/img/about/gallery/gallery-04.jpg", alt: "Falcons RFC archive photo" },
+    { src: "assets/img/about/gallery/gallery-05.jpg", alt: "Falcons RFC archive photo" },
+    { src: "assets/img/about/gallery/gallery-06.jpg", alt: "Falcons RFC archive photo" },
+    { src: "assets/img/about/gallery/gallery-07.jpg", alt: "Falcons RFC archive photo" },
+    { src: "assets/img/about/gallery/gallery-08.jpg", alt: "Falcons RFC archive photo" },
+    { src: "assets/img/about/gallery/gallery-09.jpg", alt: "Falcons RFC archive photo" },
+    { src: "assets/img/about/gallery/gallery-10.jpg", alt: "Falcons RFC archive photo" },
+    { src: "assets/img/about/gallery/gallery-11.jpg", alt: "Falcons RFC archive photo" }
+  ];
+
+  function initGallery() {
+    var root = document.getElementById("gallery-root");
+    var track = document.getElementById("gallery-track");
+    var strip = document.getElementById("gallery-strip");
+    var prev = document.getElementById("gallery-prev");
+    var next = document.getElementById("gallery-next");
+    if (!root || !track || !strip) { return; }
+
+    track.innerHTML = GALLERY_IMAGES.map(function (img, i) {
+      return '<div class="gallery__slide"><img src="' + esc(img.src) + '" alt="' + esc(img.alt) +
+        '" loading="' + (i === 0 ? "eager" : "lazy") + '" /></div>';
+    }).join("");
+    strip.innerHTML = GALLERY_IMAGES.map(function (img, i) {
+      return '<li><button class="gallery__thumb' + (i === 0 ? " is-active" : "") + '" type="button" ' +
+        'aria-label="Photo ' + (i + 1) + ' of ' + GALLERY_IMAGES.length + '" data-index="' + i + '">' +
+        '<img src="' + esc(img.src) + '" alt="" loading="lazy" /></button></li>';
+    }).join("");
+
+    var slides = track.querySelectorAll(".gallery__slide");
+    var thumbs = strip.querySelectorAll(".gallery__thumb");
+    var count = GALLERY_IMAGES.length;
+    var index = 0;
+
+    function setActive(i) {
+      index = ((i % count) + count) % count;
+      thumbs.forEach(function (t, ti) { t.classList.toggle("is-active", ti === index); });
+      var active = thumbs[index];
+      if (active && active.scrollIntoView) {
+        active.scrollIntoView({ behavior: REDUCED_MOTION ? "auto" : "smooth", inline: "center", block: "nearest" });
+      }
+    }
+
+    function goTo(i, behavior) {
+      var target = ((i % count) + count) % count;
+      track.scrollTo({ left: target * track.clientWidth, behavior: behavior || (REDUCED_MOTION ? "auto" : "smooth") });
+      setActive(target);
+    }
+
+    thumbs.forEach(function (t, i) {
+      t.addEventListener("click", function () { goTo(i); });
+    });
+    if (prev) { prev.addEventListener("click", function () { goTo(index - 1); }); }
+    if (next) { next.addEventListener("click", function () { goTo(index + 1); }); }
+
+    // Keep the filmstrip in sync when the visitor scrolls/swipes the stage directly
+    var scrollTimer = null;
+    track.addEventListener("scroll", function () {
+      window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(function () {
+        setActive(Math.round(track.scrollLeft / track.clientWidth));
+      }, 100);
+    }, { passive: true });
+
+    // Mouse drag (touch already scrolls natively)
+    var startX = 0, startScroll = 0, dragging = false, moved = false;
+    track.addEventListener("pointerdown", function (e) {
+      if (e.pointerType !== "mouse" || e.button !== 0) { return; }
+      dragging = true;
+      moved = false;
+      startX = e.clientX;
+      startScroll = track.scrollLeft;
+      track.setPointerCapture(e.pointerId);
+    });
+    track.addEventListener("pointermove", function (e) {
+      if (!dragging) { return; }
+      var dx = e.clientX - startX;
+      if (Math.abs(dx) > 6) {
+        moved = true;
+        track.classList.add("is-dragging");
+      }
+      if (moved) { track.scrollLeft = startScroll - dx; }
+    });
+    function endDrag() {
+      if (!dragging) { return; }
+      dragging = false;
+      track.classList.remove("is-dragging");
+    }
+    track.addEventListener("pointerup", endDrag);
+    track.addEventListener("pointercancel", endDrag);
+    track.addEventListener("dragstart", function (e) { e.preventDefault(); });
+
+    window.addEventListener("resize", function () { goTo(index, "auto"); });
+    setActive(0);
+  }
+
+  /* ------------------------------------------------------------------------
      6a. JOIN FORM — training application, delivered over WhatsApp
      The form composes a structured application message and opens WhatsApp
      (wa.me deep link) with it addressed to the club number from
@@ -1238,6 +1344,7 @@
     initScrollSpy();
     initHeroMarquee();
     initHeroField();
+    initGallery();
 
     loadData()
       .then(function (data) {

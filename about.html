@@ -77,7 +77,7 @@
         <span class="hero__mask"><span class="hero__line hero__line--outline">Our</span></span>
         <span class="hero__mask"><span class="hero__line">Story</span></span>
       </h1>
-      <p class="photo-hero__sub" data-photo-note="Club photos coming soon.">From a kids&rsquo; tag rugby side in 2005 to one of Malta&rsquo;s five senior clubs.</p>
+      <p class="photo-hero__sub">From a kids&rsquo; tag rugby side in 2005 to one of Malta&rsquo;s five senior clubs.</p>
     </div>
   </section>
 
@@ -131,6 +131,31 @@
             <p>That takes us to 2011. Falcons have kept playing, growing and picking up silverware in the years since, and we are filling in that part of the story here soon.</p>
             <p>Thank you to every coach, parent and volunteer who has been part of this club since 2005.</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ THROUGH THE YEARS — photo gallery ============ -->
+    <section class="section section--gallery" id="gallery" aria-labelledby="gallery-title">
+      <div class="container">
+        <header class="section-head">
+          <h2 class="section-head__title" id="gallery-title">
+            <span class="t-line"><span>Through<br />the years</span></span>
+          </h2>
+          <p class="section-head__sub">A few photos from the flock along the way. Drag, swipe or use the arrows.</p>
+        </header>
+
+        <div class="gallery" id="gallery-root">
+          <div class="gallery__stage">
+            <button class="gallery__arrow gallery__arrow--prev" id="gallery-prev" type="button" aria-label="Previous photo">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="gallery__track" id="gallery-track"></div>
+            <button class="gallery__arrow gallery__arrow--next" id="gallery-next" type="button" aria-label="Next photo">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <ul class="gallery__strip" id="gallery-strip"></ul>
         </div>
       </div>
     </section>
