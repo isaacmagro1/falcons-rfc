@@ -84,6 +84,10 @@ three-card rows.
 - Max content width **1240px** (`--container`), gutter 16px mobile / 32px ≥768px.
 - Spacing uses an **8px scale** (`--s-1` … `--s-8`).
 - Breakpoints (mobile-first): base ≤767px · `768px` tablet · `1024px` desktop.
+- Three pages share `css/style.css` and `js/script.js`: `index.html` (fixtures,
+  standings, sponsors, join), `team.html` (squad + player standings) and
+  `about.html` (club history + honours). Nav order everywhere: Fixtures ·
+  Standings · Team · Partners · About.
 
 | Region         | Mobile              | ≥768px             | ≥1024px                  |
 | -------------- | ------------------- | ------------------ | ------------------------ |
@@ -95,18 +99,17 @@ three-card rows.
 | Club           | stacked             | stacked            | 6/5 split                |
 | Footer grid    | 2 columns           | 4 columns          | 4 columns                |
 
-Page flow: hero (dark) → ticker → **fixtures (gold)** → stats (dark) →
-partners (dark) → club (dark) → matchday banner (photo) → footer. The gold
-block breaks the dark monotone exactly once, like a poster fold.
+Page flow on `index.html`: hero (dark) → ticker → **fixtures (gold)** →
+standings (dark) → stats (dark) → partners (dark) → join (dark) → footer.
+The gold block breaks the dark monotone exactly once, like a poster fold.
 
 ---
 
 ## 3. Components
 
 ### Header
-Thin utility topbar (location / season) that collapses once scrolled; solid
-nav with brand, links, gold CTA; 3px gold **reading-progress bar** fixed above
-everything. On mobile the links move into a **full-screen overlay menu**
+Solid nav with brand, links and gold CTA that gains a blurred background
+once scrolled. On mobile the links move into a **full-screen overlay menu**
 (burger → X, staggered link entrance, Esc/link-tap closes, body scroll locks).
 
 ### Hero
@@ -157,10 +160,12 @@ League table from `data/standings.json` (sorted by points, then wins):
 position, crest, club, P/W/D/L, Pts. The Falcons row gets a gold keyline +
 tint. W/D/L columns drop out under 560px. Update the JSON as results land.
 
-### Player standings
-Leader boards from `data/player-stats.json` (players: name/tries/points/
-minutes). Top five render per category; zero-stat players are skipped and
-an empty state shows until the season starts.
+### Player standings (`team.html`)
+Every squad member from `data/squad.json` renders as a row, merged with
+`data/player-stats.json` by exact name match: name + position, P (games),
+Min, Pts (`tries × 5 + conversions × 2`, computed at render), YC, RC. Sorts
+by points, then minutes, then games, so it re-ranks itself as results land.
+No empty state needed: the full squad is visible at zero from day one.
 
 ### Stats band
 Four gold-keyline stats (fixtures, years, teams, senior clubs) whose numbers
@@ -175,11 +180,24 @@ scrolls continuously (~70px/s, duration normalised to content width), pauses
 on hover/focus, and duplicates its content only enough to loop seamlessly.
 The first copy is the real one; clones are `aria-hidden` with untabbable links.
 
-### The Club
-Editorial split: about copy (lead paragraph brighter than the rest), facts as
-a **hairline ledger** (label left, Anton value right), social buttons; then
-the jersey photo (clip-path wipe reveal) and honours as a **numbered index**
-(`01`–`04`, gold counters, hover nudge).
+### About page (`about.html`)
+- **Photo hero** (`.photo-hero`, shared with `team.html`): full-bleed band
+  reserved for a photo (`assets/img/about/hero.jpg`); falls back to the
+  jersey pattern with a quiet "Club photos coming soon" note
+  (`data-photo-note` on `.photo-hero__sub`, shown via `.no-photo` + `::after`)
+  until the file exists.
+- **History** (`.history`): the club's story from founding (2005) to today,
+  segmented into year-tagged blocks (gold Anton year + heading + prose,
+  `140px` label column ≥768px) so a photo can slot beside any era later
+  without restructuring. Closes with an undated thank-you block, set apart
+  by a gold-tinted rule.
+- **The Club today**: about copy (short lead sentence from
+  `data/team-info.json`, rendered brighter than the rest), social buttons,
+  the jersey photo (clip-path wipe reveal) and honours as a **numbered
+  index** (`01`–`04`, gold counters, hover nudge). This is the same
+  `#club-about` / `#club-social` / `#club-honours` markup that used to live
+  on the homepage — `js/script.js`'s `renderClub()` is unchanged, it just
+  targets elements that moved pages.
 
 ### Buttons
 `.btn--gold` (primary), `.btn--ghost` (outline), `.btn--dark` (black w/ gold
@@ -203,11 +221,10 @@ either moves (marquees, parallax) or enters with motion (reveals, count-ups).
   never do).
 - **Always moving:** the hero triangle field, ticker, partner marquee and
   the countdown never sit still (marquees pause on hover/focus so they can
-  be read). The scroll-progress bar and header state track every scroll.
-- **Scroll-linked:** one rAF loop drives header shrink, the progress bar,
-  the hero **wordmark drift** and the banner **parallax layer**
-  (`data-parallax`; offset zeroed at viewport centre and clamped so edges
-  never show).
+  be read). Header state tracks every scroll.
+- **Scroll-linked:** one rAF loop drives header shrink and the hero
+  **wordmark drift** (`data-parallax`; offset zeroed at viewport centre and
+  clamped so edges never show).
 - **Pointer-reactive:** the hero field ignites around the cursor; the
   featured match card **tilts** toward it (±3°, fine pointers only); the
   fixture rail **skews with scroll velocity** (±4°, eases back upright).
@@ -257,13 +274,15 @@ All content is data-driven from `data/`:
 | ----------------- | --------------------------------------------------- |
 | `matches.json`    | Hero match card, featured panel, rail, fixtures stat |
 | `sponsors.json`   | Spotlight + partner logo marquee (logos in assets/img/sponsors/) |
-| `standings.json`  | Club standings table                                 |
-| `player-stats.json` | Player leader boards (tries, points, minutes)      |
-| `team-info.json`  | About copy, facts ledger, honours index, social links, WhatsApp number |
+| `standings.json`  | Club standings table (`index.html`)                  |
+| `squad.json`      | Squad by position and the player standings roster (`team.html`) |
+| `player-stats.json` | Per-player P/Min/tries/conversions/cards, merged onto `squad.json` by name (`team.html`) |
+| `team-info.json`  | About lead sentence, honours index, social links, WhatsApp number |
 
 `fetch()` is the source of truth; a build-time copy of the same JSON lives in
-`index.html` (`<script type="application/json" id="fallback-data">`) so the
-site still renders when opened from disk (`file://`), where browsers block
+each page (`<script type="application/json" id="fallback-data">` in
+`index.html`, `team.html` and `about.html`) so the site still renders when
+opened from disk (`file://`), where browsers block
 fetch. **If you edit the JSON files, re-sync the inline copy** (or just ignore
 it when the site is properly hosted).
 
