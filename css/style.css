@@ -2314,7 +2314,7 @@ button {
 .footer-brand { grid-column: 1 / -1; }
 @media (min-width: 768px) {
   .footer-grid {
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: var(--s-4);
     padding-block: var(--s-5);
   }
@@ -2392,20 +2392,9 @@ button {
   .footer-legal__sep { display: none; }
 }
 
-/* Privacy/Terms — footer only, deliberately not in the main nav */
-.footer-legal__links {
-  display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  padding-top: var(--s-2);
-  font-size: 0.75rem;
-}
-.footer-legal__links a {
-  color: var(--text-faint);
-}
-@media (hover: hover) and (pointer: fine) {
-  .footer-legal__links a:hover { color: var(--gold); }
-}
+/* Privacy/Terms now live in their own "Legal" footer-col (next to
+   Explore), styled by the existing .footer-col rules — not down here
+   under the copyright line. */
 
 .noscript-note {
   padding: var(--s-3);
