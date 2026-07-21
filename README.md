@@ -1,6 +1,6 @@
 # Falcons RFC — Official Website
 
-Three-page site for Falcons RFC built with plain HTML, CSS and vanilla
+Five-page site for Falcons RFC built with plain HTML, CSS and vanilla
 JavaScript. No frameworks, no build step.
 
 ## Run it
@@ -22,8 +22,10 @@ copy of the data because browsers block `fetch()` on `file://`.
 index.html          Home: hero, fixtures, standings, sponsors, join form
 team.html            Squad by position + player standings
 about.html           Club history + honours
-css/style.css        All styles, shared by all three pages
-js/script.js         All behaviour, shared by all three pages
+privacy.html         Privacy Policy (footer link only)
+terms.html           Terms of Service (footer link only)
+css/style.css        All styles, shared by all five pages
+js/script.js         All behaviour, shared by all five pages
 data/                ← edit these to update the site
   matches.json        Fixtures (dates, opponents, venues, times, home/away)
   sponsors.json       Sponsor roster (tier "main" = spotlight)

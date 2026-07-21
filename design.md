@@ -84,12 +84,15 @@ three-card rows.
 - Max content width **1240px** (`--container`), gutter 16px mobile / 32px ≥768px.
 - Spacing uses an **8px scale** (`--s-1` … `--s-8`).
 - Breakpoints (mobile-first): base ≤767px · `768px` tablet · `1024px` desktop.
-- Three pages share `css/style.css` and `js/script.js`: `index.html` (fixtures,
-  standings, sponsors, join), `team.html` (squad + player standings) and
-  `about.html` (club history + honours). Nav order everywhere: Fixtures ·
-  About · Team · Partners. Standings has no nav entry (it is still on the
-  homepage, just not linked) since a fourth top-level item did not earn
-  its place; reach it via the Fixtures section.
+- Five pages share `css/style.css` and `js/script.js`: `index.html` (fixtures,
+  standings, sponsors, join), `team.html` (squad + player standings),
+  `about.html` (club history + honours), and `privacy.html`/`terms.html`
+  (plain-prose legal pages, `.legal` component). Nav order everywhere:
+  Fixtures · About · Team · Partners. Standings has no nav entry (it is
+  still on the homepage, just not linked) since a fourth top-level item
+  did not earn its place; reach it via the Fixtures section. Privacy and
+  Terms are deliberately footer-only (a small centred link row under the
+  copyright line) — never in the main nav or mobile menu.
 
 | Region         | Mobile              | ≥768px             | ≥1024px                  |
 | -------------- | ------------------- | ------------------ | ------------------------ |
