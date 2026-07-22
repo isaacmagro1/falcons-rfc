@@ -706,8 +706,8 @@
           '<td class="standings__num">' + r.games + "</td>" +
           '<td class="standings__num col-min">' + r.minutes + "</td>" +
           '<td class="standings__num standings__pts">' + r.points + "</td>" +
-          '<td class="standings__num ptable__yc">' + r.yellow + "</td>" +
-          '<td class="standings__num ptable__rc">' + r.red + "</td>" +
+          '<td class="standings__num ptable__yc col-yc">' + r.yellow + "</td>" +
+          '<td class="standings__num ptable__rc col-rc">' + r.red + "</td>" +
         "</tr>"
       );
     }).join("");
@@ -720,8 +720,8 @@
           '<th scope="col" title="Games played">P</th>' +
           '<th scope="col" title="Minutes played" class="col-min">Min</th>' +
           '<th scope="col" title="Points from tries and conversions">Pts</th>' +
-          '<th scope="col" title="Yellow cards">YC</th>' +
-          '<th scope="col" title="Red cards">RC</th>' +
+          '<th scope="col" title="Yellow cards" class="col-yc">YC</th>' +
+          '<th scope="col" title="Red cards" class="col-rc">RC</th>' +
         "</tr></thead><tbody>" + body + "</tbody></table>" +
       ((data && data.note) ? '<p class="standings__note">' + esc(data.note) + "</p>" : "");
   }
