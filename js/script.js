@@ -1211,6 +1211,10 @@
   }
 
   /** Mobile full-screen menu. */
+  /* Set by initMenu so the brand link (which lives outside the overlay)
+     can close the mobile menu too. No-op until the menu exists. */
+  var closeMobileMenu = function () {};
+
   function initMenu() {
     var burger = document.getElementById("nav-burger");
     var overlay = document.getElementById("menu-overlay");
@@ -1234,6 +1238,8 @@
       }
     }
 
+    closeMobileMenu = function () { setOpen(false); };
+
     burger.addEventListener("click", function () {
       setOpen(burger.getAttribute("aria-expanded") !== "true");
     });
@@ -1248,6 +1254,31 @@
     });
     window.matchMedia("(min-width: 768px)").addEventListener("change", function (q) {
       if (q.matches) { setOpen(false); }
+    });
+  }
+
+  /**
+   * The brand logo should return you to the top of the home page.
+   * Two things stopped it: `id="top"` sits on the position:fixed header,
+   * which is always "in view", so the browser's native fragment jump had
+   * nothing to scroll; and the logo lives outside the mobile overlay, so
+   * clicking it left the menu open with body scroll still locked.
+   */
+  function initBrandLink() {
+    var brand = document.querySelector(".nav-brand");
+    if (!brand) { return; }
+    brand.addEventListener("click", function (e) {
+      closeMobileMenu();
+      var href = brand.getAttribute("href") || "";
+      // Only intercept the same-page case; on other pages the logo is a
+      // normal link to index.html and should navigate as usual.
+      if (href.charAt(0) !== "#") { return; }
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: REDUCED_MOTION ? "auto" : "smooth" });
+      // Drop the stale "#top" so a refresh doesn't try to re-anchor
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      }
     });
   }
 
@@ -1368,6 +1399,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     initScrollLoop();
     initMenu();
+    initBrandLink();
     initFooterYear();
     initScrollSpy();
     initHeroMarquee();
